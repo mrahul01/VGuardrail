@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- LaunchDaemon for vguardiand. Install to /Library/LaunchDaemons/ and load with
+     `sudo launchctl bootstrap system /Library/LaunchDaemons/com.vguardrail.agent.plist`.
+     Adjust the binary path, the policy public key, and the XPC code requirement. -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.vguardrail.agent</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/libexec/vguardrail/vguardiand</string>
+    </array>
+
+    <!-- Vends the XPC service the menu bar app and connectors connect to. -->
+    <key>MachServices</key>
+    <dict>
+        <key>com.vguardrail.agent.xpc</key>
+        <true/>
+    </dict>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>VG_SOCKET_PATH</key>
+        <string>/var/run/vguardrail/policy.sock</string>
+        <key>VG_STORE_PATH</key>
+        <string>/var/db/vguardrail/agent.db</string>
+        <key>VG_IDENTITY_DIR</key>
+        <string>/var/db/vguardrail/identity</string>
+        <key>VG_POLICY_BUNDLE</key>
+        <string>/var/db/vguardrail/policy.bundle.json</string>
+        <!-- Set to your backend to enable uploads; omit to run offline. -->
+        <!-- <key>VG_UPLOAD_URL</key><string>https://api.example.com</string> -->
+        <!-- Code-signing requirement that XPC peers must satisfy (fail-closed). -->
+        <key>VG_XPC_REQUIREMENT</key>
+        <string>anchor apple generic and certificate leaf[subject.OU] = "YOUR_TEAM_ID"</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>StandardErrorPath</key>
+    <string>/var/log/vguardrail/vguardiand.log</string>
+    <key>StandardOutPath</key>
+    <string>/var/log/vguardrail/vguardiand.log</string>
+</dict>
+</plist>

@@ -1,0 +1,15 @@
+[package]
+name = "audit-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "VGuardrail Audit Cloud — audit event types, tamper-evident hash chain, and idempotency keys."
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+pe-core = { workspace = true }

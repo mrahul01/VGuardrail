@@ -1,0 +1,350 @@
+openapi: 3.1.0
+info:
+  title: VGuardrail Audit Cloud API
+  version: "0.1.0"
+  description: >-
+    Agent-facing API for the VGuardrail AI Governance Platform. Supports the
+    end-to-end agent flow: device registration, signed-policy download, and
+    tamper-evident audit-event ingestion.
+
+    Audit records form a per-device hash chain (event_hash / previous_event_hash)
+    and ingestion is idempotent on event_id and upload_id.
+  license:
+    name: Apache-2.0
+
+servers:
+  - url: https://{api_id}.execute-api.{region}.amazonaws.com
+    variables:
+      api_id: { default: "REPLACE" }
+      region: { default: "us-east-1" }
+
+tags:
+  - name: agent
+    description: Endpoints called by the macOS endpoint agent.
+  - name: ops
+    description: Operational endpoints.
+
+paths:
+  /health:
+    get:
+      tags: [ops]
+      summary: Liveness/readiness probe.
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: Service healthy.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+
+  /devices/register:
+    post:
+      tags: [agent]
+      summary: Register a device and bootstrap its identity.
+      description: >-
+        Gated by an org enrollment secret (header X-Enrollment-Token). Creates
+        the device's Cognito user and DynamoDB record (idempotent on device_id)
+        and returns JWTs the agent uses for subsequent calls.
+      operationId: registerDevice
+      security:
+        - enrollmentSecret: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RegisterRequest" }
+      responses:
+        "200":
+          description: Registered (or already registered — idempotent).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RegisterResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /policies/latest:
+    get:
+      tags: [agent]
+      summary: Download the latest signed policy bundle for the caller's org.
+      description: >-
+        Returns the Ed25519-signed bundle the engine verifies and loads.
+        Supports conditional GET: send If-None-Match with the current version to
+        receive 304 when unchanged.
+      operationId: getLatestPolicy
+      security:
+        - cognitoJWT: []
+      parameters:
+        - in: header
+          name: If-None-Match
+          required: false
+          schema: { type: string }
+          description: ETag (policy version) the client currently holds.
+      responses:
+        "200":
+          description: The latest signed policy bundle.
+          headers:
+            ETag:
+              schema: { type: string }
+              description: Current policy version.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PolicyBundle" }
+        "304":
+          description: Not modified (client already holds the latest version).
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404":
+          description: No policy published for the org yet.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /devices/inventory:
+    post:
+      tags: [agent]
+      summary: Upload the device's process/extension inventory snapshot.
+      description: >-
+        Latest-wins snapshot of running processes/apps and installed browser
+        extensions, shown on the dashboard's device detail page. Process names
+        only (no command arguments), capped at 300 processes / 100 extensions.
+      operationId: uploadInventory
+      security:
+        - cognitoJWT: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DeviceInventory" }
+      responses:
+        "200":
+          description: Snapshot stored (replaces the previous snapshot).
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /events/batch:
+    post:
+      tags: [agent]
+      summary: Upload a batch of audit events (idempotent, tamper-evident).
+      description: >-
+        Ingests redacted audit events. Idempotent on upload_id (replays return
+        the original result) and on event_id (duplicates are accepted but never
+        re-stored). Each stored record is chained via event_hash /
+        previous_event_hash per device.
+      operationId: uploadEvents
+      security:
+        - cognitoJWT: []
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: false
+          schema: { type: string }
+          description: >-
+            Client upload id. If omitted, the server derives a deterministic
+            upload_id from the sorted set of event_ids in the batch.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BatchRequest" }
+      responses:
+        "200":
+          description: Batch processed (or replayed).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BatchResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "413":
+          description: Batch too large (> 1000 events or > 5 MB).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: One or more events failed validation.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+components:
+  securitySchemes:
+    cognitoJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cognito access token (device user). Validated by the API Gateway JWT authorizer.
+    enrollmentSecret:
+      type: apiKey
+      in: header
+      name: X-Enrollment-Token
+      description: Per-org enrollment secret (Secrets Manager). Register only.
+
+  responses:
+    BadRequest:
+      description: Malformed request.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Unauthorized:
+      description: Missing/invalid credentials.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  schemas:
+    Health:
+      type: object
+      required: [status, version]
+      properties:
+        status: { type: string, const: healthy }
+        version: { type: string }
+        time: { type: string, format: date-time }
+
+    RegisterRequest:
+      type: object
+      required: [device_id, hostname, platform, agent_version]
+      properties:
+        device_id: { type: string, description: Stable device id (UUIDv7). }
+        hostname: { type: string }
+        platform: { type: string, enum: [macos] }
+        agent_version: { type: string }
+      additionalProperties: false
+
+    RegisterResponse:
+      type: object
+      required: [status, org_id, access_token, refresh_token, expires_in]
+      properties:
+        status: { type: string, enum: [registered] }
+        org_id: { type: string }
+        access_token: { type: string }
+        refresh_token: { type: string }
+        expires_in: { type: integer, example: 3600 }
+
+    BatchRequest:
+      type: object
+      required: [events]
+      properties:
+        upload_id:
+          type: string
+          description: Optional idempotency key (also accepted via Idempotency-Key header).
+        events:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items: { $ref: "#/components/schemas/AuditEvent" }
+      additionalProperties: false
+
+    BatchResponse:
+      type: object
+      required: [accepted, rejected, upload_id, replayed]
+      properties:
+        accepted: { type: integer, description: Events durably stored or already present. }
+        rejected: { type: integer, description: Events that failed validation. }
+        upload_id: { type: string }
+        replayed:
+          type: boolean
+          description: True if this upload_id was already processed and the original result was returned.
+
+    AuditEvent:
+      type: object
+      description: >-
+        Redacted audit envelope produced by the agent (no prompt text, no raw
+        secrets). On read, records also carry server-assigned event_hash and
+        previous_event_hash forming the per-device chain.
+      required: [event_id, type, timestamp_ms, user_id, device_id, decision, risk_level, classification, policy_version]
+      properties:
+        event_id: { type: string, description: UUIDv7 (time-ordered, unique). }
+        schema: { type: string, example: "vguardrail.event/v1" }
+        type:
+          type: string
+          enum: [PromptSubmitted, PolicyEvaluated, PromptAllowed, PromptWarned, WarningAccepted, WarningRejected, PromptBlocked, PolicyViolation, UploadSuccess, UploadFailure, AgentStarted, PolicyUpdated]
+        timestamp_ms: { type: integer, format: int64 }
+        user_id: { type: string }
+        device_id: { type: string }
+        source: { type: string, enum: [browser, ide, cli, api], nullable: true }
+        provider: { type: string, nullable: true }
+        model: { type: string, nullable: true }
+        app: { type: string, nullable: true }
+        decision: { type: string, enum: [allow, warn, block] }
+        risk_level: { type: string, enum: [low, medium, high, critical] }
+        classification: { type: string, enum: [public, internal, confidential, restricted] }
+        policy_version: { type: integer }
+        matched_rule_id: { type: string, nullable: true }
+        category:
+          type: string
+          nullable: true
+          description: >-
+            Decision category (snake_case wire name, e.g. company_confidential).
+            Kept as a free string so old and new engines interoperate.
+        reason:
+          type: string
+          nullable: true
+          description: Human-readable explanation of the decision.
+        suppressions:
+          type: array
+          items: { $ref: "#/components/schemas/Suppression" }
+        incomplete: { type: boolean }
+        findings:
+          type: array
+          items: { $ref: "#/components/schemas/AuditFinding" }
+        event_hash:
+          type: string
+          readOnly: true
+          description: SHA-256 over canonical event content + previous_event_hash (server-assigned).
+        previous_event_hash:
+          type: string
+          readOnly: true
+          description: event_hash of the prior event for this device (chain link); empty for the genesis event.
+
+    AuditFinding:
+      type: object
+      required: [detector_id, category, kind, span_start, span_end, confidence, severity, redacted_preview]
+      properties:
+        detector_id: { type: string }
+        category: { type: string, enum: [secret, pii, source_code, classification, company_confidential, financial, intellectual_property, usage_policy, prompt_injection, sensitive_document, customer_data, compliance, keyword, file_policy, image_policy, ai_classification, destructive_command, legal, medical, hr, security, research_development, communication, procurement, government] }
+        kind: { type: string }
+        span_start: { type: integer }
+        span_end: { type: integer }
+        confidence: { type: number, format: float }
+        severity: { type: string, enum: [low, medium, high, critical] }
+        redacted_preview: { type: string, description: Redacted preview only — never a raw secret. }
+        meta: { type: object, additionalProperties: { type: string } }
+
+    Suppression:
+      type: object
+      required: [rule_id, exception_id]
+      properties:
+        rule_id: { type: string }
+        exception_id: { type: string }
+
+    PolicyBundle:
+      type: object
+      description: >-
+        Ed25519-signed policy bundle (the engine's unit of distribution). The
+        cloud stores and serves it; it never signs (offline/CI signing).
+      required: [schema, version, org_id, created_at, default_action, rules, signature]
+      properties:
+        schema: { type: string, example: "vguardrail.policy/v1" }
+        version: { type: integer }
+        previous_version: { type: integer, nullable: true }
+        org_id: { type: string }
+        created_at: { type: string, format: date-time }
+        default_action: { type: string, enum: [allow, warn, block] }
+        exceptions: { type: array, items: { type: object, additionalProperties: true } }
+        rules: { type: array, items: { type: object, additionalProperties: true } }
+        signature:
+          type: object
+          required: [alg, key_id, value]
+          properties:
+            alg: { type: string, const: ed25519 }
+            key_id: { type: string }
+            value: { type: string, description: base64 Ed25519 signature. }
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+            request_id: { type: string }

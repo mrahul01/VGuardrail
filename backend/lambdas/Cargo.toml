@@ -1,0 +1,59 @@
+# VGuardrail Audit Cloud — Rust Lambda workspace.
+# Reuses the policy engine's pe-core (enums) and pe-dsl (signed bundle verify) via
+# path dependencies so the cloud and engine share one source of truth.
+#
+# Note: the Docker-native HTTP server lives in `../server/` and is
+# **not** a member of this workspace. It has its own Cargo.toml that
+# path-depends on the crates below. This keeps the Lambda binaries
+# buildable in isolation (for the legacy deployment) without forcing
+# the new server into the same `cargo` invocation.
+[workspace]
+resolver = "2"
+members = [
+    "crates/audit-core",
+    "crates/app",
+    "crates/aws",
+    "crates/functions",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.82"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+sha2 = "0.10"
+hex = "0.4"
+async-trait = "0.1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+
+# Lambda runtime.
+lambda_runtime = "0.13"
+lambda_http = "0.13"
+
+# AWS SDK (used by the `aws` adapter crate + function bins).
+aws-config = { version = "1", features = ["behavior-version-latest"] }
+aws-sdk-dynamodb = "1"
+aws-sdk-s3 = "1"
+aws-sdk-cognitoidentityprovider = "1"
+aws-sdk-secretsmanager = "1"
+
+# Engine reuse (single source of truth for enums + signed-bundle verification).
+pe-core = { path = "../../policy-engine/crates/pe-core" }
+pe-dsl = { path = "../../policy-engine/crates/pe-dsl" }
+
+# Internal.
+audit-core = { path = "crates/audit-core" }
+app = { path = "crates/app" }
+aws-adapters = { path = "crates/aws" }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true

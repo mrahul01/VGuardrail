@@ -1,0 +1,20 @@
+{
+  "name": "@vguardrail/cli-shared",
+  "version": "0.1.0",
+  "description": "Shared Node.js framework for AI CLI connectors",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@vguardrail/connector-sdk": "file:../../connector-sdk",
+    "inquirer": "^9.2.22"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}

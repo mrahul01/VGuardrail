@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "VGuardrail Firefox Connector",
+  "version": "0.1.0",
+  "description": "Evaluates AI prompts against organizational policy before they are submitted to ChatGPT, Claude, Gemini, and Perplexity.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "connector@vguardrail.com",
+      "strict_min_version": "115.0"
+    }
+  },
+  "permissions": ["nativeMessaging", "storage"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://www.perplexity.ai/*",
+    "https://perplexity.ai/*",
+    "http://localhost:8080/*"
+  ],
+  "background": {
+    "scripts": ["background/service-worker.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*",
+        "https://www.perplexity.ai/*",
+        "https://perplexity.ai/*"
+      ],
+      "js": ["content/content-script.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

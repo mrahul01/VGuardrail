@@ -1,0 +1,42 @@
+{
+  "schema": "vguardrail.policy/v1",
+  "version": 1,
+  "previous_version": null,
+  "org_id": "local-org",
+  "created_at": "2026-06-12T00:00:00Z",
+  "default_action": "allow",
+  "exceptions": [],
+  "rules": [
+    {
+      "rule_id": "restricted-block",
+      "name": "Block restricted content",
+      "description": "Secrets, credentials and other restricted-class detections are blocked outright.",
+      "severity": "critical",
+      "priority": 0,
+      "action": "block",
+      "match": { "detector": "classification", "op": "at_least", "value": "restricted" },
+      "message": "Restricted content (secrets/credentials) may not be sent to AI tools."
+    },
+    {
+      "rule_id": "confidential-warn",
+      "name": "Warn on confidential content",
+      "description": "Confidential-class content (PII, medical, security, government) raises a high-risk warning; connectors escalate this to a local block.",
+      "severity": "high",
+      "priority": 10,
+      "action": "warn",
+      "match": { "detector": "classification", "op": "at_least", "value": "confidential" },
+      "message": "Confidential content detected — sending this to an AI tool violates policy."
+    },
+    {
+      "rule_id": "internal-warn",
+      "name": "Alert on internal content",
+      "description": "Internal-class content (internal memos, HR, legal, source code) requires explicit acknowledgement.",
+      "severity": "medium",
+      "priority": 20,
+      "action": "warn",
+      "match": { "detector": "classification", "op": "at_least", "value": "internal" },
+      "message": "Internal content detected — confirm before sending to an AI tool."
+    }
+  ],
+  "signature": null
+}

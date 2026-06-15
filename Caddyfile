@@ -1,0 +1,117 @@
+# VGuardrail — production reverse proxy / TLS terminator.
+#
+# Hosts:
+#   vguardrail.verisync.digital  →  Next.js dashboard container
+#   api.verisync.digital         →  Rust backend container
+#
+# Caddy automatically provisions and renews Let's Encrypt TLS
+# certificates for both hostnames. HTTP→HTTPS redirect is
+# implicit (`auto_https` is on by default).
+#
+# To run:
+#
+#     caddy run --config Caddyfile --adapter native
+#
+# or as a Docker container (the recommended way):
+#
+#     docker run -d --name caddy \
+#       -p 80:80 -p 443:443 \
+#       -v $PWD/Caddyfile:/etc/caddy/Caddyfile:ro \
+#       -v caddy_data:/data \
+#       -v caddy_config:/config \
+#       caddy:2
+#
+# Notes
+#   * The `forward_auth` directive is **not** used. The Rust
+#     backend performs its own RS256 Cognito JWT verification; Caddy
+#     is purely a TLS terminator + router.
+#   * Per-API rate limiting (mirroring API Gateway's
+#     `throttle_burst=200, throttle_rate=100`) is enforced by the
+#     `rate_limit` named zone below.
+#   * All backend access logs go to stdout in the JSON format
+#     the existing CloudWatch log queries expect
+#     (requestId, ip, requestTime, httpMethod, routeKey, status, …).
+
+{
+    # Global options
+    email ops@verisync.digital
+    admin off
+    default_sni vguardrail.verisync.digital
+    # Logs in JSON to stdout — picked up by CloudWatch / Docker logs.
+    log default {
+        output stdout
+        format json
+    }
+}
+
+# ── Dashboard ─────────────────────────────────────────────────────────────
+vguardrail.verisync.digital {
+    # HTTP→HTTPS redirect is automatic; explicit `redir` makes the
+    # intent obvious to operators reading the config.
+    reverse_proxy dashboard:3000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto https
+        # Streaming is fine for the SSR app; the BFF is server-side.
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 30s
+        }
+    }
+
+    # Security headers (defense in depth; the backend also sets some).
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # The dashboard uses inline styles for Tailwind; allow them.
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.amazoncognito.com https://cognito-idp.*.amazonaws.com"
+        # Hide Caddy version.
+        -Server
+    }
+
+    encode zstd gzip
+}
+
+# ── Backend API ──────────────────────────────────────────────────────────
+api.verisync.digital {
+    # Mirror API Gateway throttling.
+    rate_limit {
+        zone api_zone {
+            key    {remote_host}
+            events 200
+            window 1s
+        }
+    }
+
+    reverse_proxy backend:8080 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto https
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 30s
+        }
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        # The agent uses this; allow cross-origin GETs.
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Authorization, Content-Type, Idempotency-Key, x-enrollment-token, x-request-id"
+        -Server
+    }
+
+    encode zstd gzip
+}
+
+# ── Catch-all (anything that doesn't match) ──────────────────────────────
+:80 {
+    # Any unknown hostname → 404.
+    respond "vguardrail: no such host" 404
+}

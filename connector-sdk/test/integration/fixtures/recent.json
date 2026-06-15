@@ -1,0 +1,17 @@
+[
+  {
+    "requestID": "req-block-1",
+    "timestampMs": 1717600000000,
+    "action": "block",
+    "riskLevel": "critical",
+    "matchedRuleID": "rule.secret.aws",
+    "provider": "openai",
+    "app": "chatgpt"
+  },
+  {
+    "requestID": "req-allow-1",
+    "timestampMs": 1717600001000,
+    "action": "allow",
+    "riskLevel": "low"
+  }
+]

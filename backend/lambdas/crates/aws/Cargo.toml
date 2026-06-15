@@ -1,0 +1,25 @@
+[package]
+name = "aws-adapters"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "VGuardrail Audit Cloud — AWS adapters implementing the app ports (DynamoDB, S3, Cognito, Secrets Manager)."
+
+[lib]
+name = "aws_adapters"
+
+[dependencies]
+app = { workspace = true }
+audit-core = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+tracing = { workspace = true }
+uuid = { version = "1", features = ["v4"] }
+
+aws-config = { workspace = true }
+aws-sdk-dynamodb = { workspace = true }
+aws-sdk-s3 = { workspace = true }
+aws-sdk-cognitoidentityprovider = { workspace = true }
+aws-sdk-secretsmanager = { workspace = true }

@@ -1,0 +1,74 @@
+# VGuardrail detector-policy configuration (loaded via VG_DETECTOR_CONFIG).
+#
+# Every key is optional; omitted keys keep the engine defaults shown here.
+# Unknown keys are rejected at startup so typos fail loudly.
+#
+#   VG_DETECTOR_CONFIG=/etc/vguardrail/detectors.yaml pe-engined
+
+# Regex for the org's customer-id format (pii.customer_id detector).
+customer_id_pattern: '\bCUST-\d{6,}\b'
+
+# Minimum Shannon entropy (bits/char) for the generic secret detector.
+generic_entropy_threshold: 3.5
+
+# Org project codenames (company_confidential.content detector, severity High).
+project_codenames: []
+#  - "Project Falcon"
+#  - "Atlas Next"
+
+# Extra acceptable-use phrases (usage_policy.restricted_use detector).
+usage_policy_phrases: []
+#  - "ghostwrite my thesis"
+
+# Keyword policy (keyword.configured detector). `keywords` REPLACES the default
+# list; `custom_keywords` is appended to it.
+keywords:
+  - confidential
+  - restricted
+  - internal only
+  - do not share
+custom_keywords: []
+
+# Distinct email addresses at which a prompt counts as a customer-list export
+# (customer_data.records detector).
+bulk_email_threshold: 3
+
+# Set true to whitelist image prompts entirely (disables image_policy).
+allow_images: false
+
+# Destructive shell-command detection (destructive_command.shell detector).
+# Built-in rules cover rm -rf, raw-device writes, mkfs/shred, permission bombs,
+# curl|sh, fork bombs, DROP DATABASE. `patterns` adds org-specific literal
+# phrases (case-insensitive, whitespace-flexible). All findings are CRITICAL.
+destructive_commands:
+  enabled: true
+  patterns: []
+  #  - "drop prod database"
+
+# Sensitive infrastructure info (secret.sensitive_info detector).
+# DB connection strings with embedded credentials are always CRITICAL;
+# ARNs/account ids are HIGH; internal IPs/domains are MEDIUM.
+sensitive_info:
+  enabled: true
+  internal_ip: true        # RFC-1918 addresses (10/8, 172.16/12, 192.168/16)
+  aws_account_id: true     # 12-digit ids, gated on nearby AWS context
+  internal_domains: []     # org domain suffixes, e.g. "corp.example.com"
+
+# Domain-content lexicons (categories 18-25: legal, medical, hr, security,
+# research_development, communication, procurement, government). Each list
+# APPENDS org-specific phrases to the built-in defaults; `enabled: false`
+# turns all eight detectors off.
+domain_lexicons:
+  enabled: true
+  legal_phrases: []                  #  - "case zebra"
+  medical_phrases: []
+  hr_phrases: []
+  security_phrases: []
+  research_development_phrases: []
+  communication_phrases: []
+  procurement_phrases: []
+  government_phrases: []
+
+# High-critical force block: any CRITICAL finding overrides allow/warn rule
+# outcomes and blocks. Approved (time-bounded, audited) exceptions still win.
+critical_force_block: true

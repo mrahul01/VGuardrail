@@ -1,0 +1,25 @@
+[package]
+name = "pe-store"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "VGuardrail Policy Engine — local SQLite persistence (event queue, policy cache, device state)."
+
+[features]
+default = []
+# Enables at-rest encryption via SQLCipher (production). Requires the SQLCipher
+# system/bundled library; off by default so unit tests run on plain SQLite.
+sqlcipher = ["rusqlite/bundled-sqlcipher"]
+
+[dependencies]
+rusqlite = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "queue"
+harness = false

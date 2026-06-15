@@ -1,0 +1,40 @@
+[package]
+name = "pe-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "VGuardrail Policy Engine — pipeline orchestration, gRPC service, and the LaunchDaemon server binary."
+default-run = "pe-engined"
+
+[lib]
+name = "pe_engine"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pe-engined"
+path = "src/main.rs"
+
+[dependencies]
+pe-core = { workspace = true }
+pe-dsl = { workspace = true }
+pe-detectors = { workspace = true }
+pe-store = { workspace = true }
+pe-grpc = { workspace = true }
+tonic = { workspace = true }
+tokio = { workspace = true }
+thiserror = { workspace = true }
+ed25519-dalek = { workspace = true }
+base64 = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+uuid = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+tempfile = { workspace = true }
+
+[[bench]]
+name = "pipeline"
+harness = false

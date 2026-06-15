@@ -1,0 +1,4 @@
+alice@example.com
+please contact bob.smith@corp.co.uk for details
+user+tag@sub.domain.org
+admin@127-host.internal.net

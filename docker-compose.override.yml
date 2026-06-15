@@ -1,0 +1,14 @@
+# Dev override: publish ports to the host and pass AWS creds to the backend as
+# env vars (default SDK chain). Production uses Caddy (no published ports) and an
+# ECS task role (no static keys). Generated/consumed by setup.sh.
+services:
+  backend:
+    ports:
+      - "8080:8080"
+    environment:
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_SESSION_TOKEN: "${AWS_SESSION_TOKEN:-}"
+  dashboard:
+    ports:
+      - "3000:3000"

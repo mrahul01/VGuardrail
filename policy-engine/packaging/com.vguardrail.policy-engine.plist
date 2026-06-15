@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- LaunchDaemon for pe-engined, the policy engine vguardiand consults for every
+     decision. Without supervision the engine can die silently and every prompt
+     fails closed ("policy engine unavailable") until it is restarted by hand.
+     KeepAlive makes launchd respawn it; ThrottleInterval caps a crash loop.
+
+     Install to /Library/LaunchDaemons/ and load with:
+       sudo launchctl bootstrap system \
+         /Library/LaunchDaemons/com.vguardrail.policy-engine.plist
+     Bootstrap this BEFORE com.vguardrail.agent so the socket exists when the
+     daemon's first health check runs. Adjust the binary path and the policy
+     public key / signing seed for your deployment. -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.vguardrail.policy-engine</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/libexec/vguardrail/pe-engined</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- UDS the engine serves on; must match the daemon's VG_SOCKET_PATH. -->
+        <key>VG_SOCKET_PATH</key>
+        <string>/var/run/vguardrail/policy.sock</string>
+        <key>VG_STORE_PATH</key>
+        <string>/var/db/vguardrail/engine.db</string>
+        <!-- ed25519 public key (base64) used to verify signed policy bundles. -->
+        <key>VG_POLICY_PUBKEY</key>
+        <string>REPLACE_WITH_BASE64_ED25519_PUBKEY</string>
+        <!-- base64 32-byte seed for signing audit events. -->
+        <key>VG_EVENT_SIGNING_SEED</key>
+        <string>REPLACE_WITH_BASE64_32_BYTE_SEED</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <!-- The whole point: launchd respawns the engine if it exits or crashes. -->
+    <key>KeepAlive</key>
+    <true/>
+    <!-- Back off a crash loop (default is 10s; be explicit). -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>StandardErrorPath</key>
+    <string>/var/log/vguardrail/pe-engined.log</string>
+    <key>StandardOutPath</key>
+    <string>/var/log/vguardrail/pe-engined.log</string>
+</dict>
+</plist>

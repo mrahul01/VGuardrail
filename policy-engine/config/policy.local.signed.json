@@ -1,0 +1,73 @@
+{
+  "schema": "vguardrail.policy/v1",
+  "version": 1,
+  "previous_version": null,
+  "org_id": "local-org",
+  "created_at": "2026-06-12T00:00:00Z",
+  "default_action": "allow",
+  "exceptions": [],
+  "rules": [
+    {
+      "rule_id": "restricted-block",
+      "name": "Block restricted content",
+      "description": "Secrets, credentials and other restricted-class detections are blocked outright.",
+      "enabled": true,
+      "severity": "critical",
+      "priority": 0,
+      "action": "block",
+      "min_confidence": 0.8,
+      "match": {
+        "detector": "classification",
+        "op": "at_least",
+        "min_count": null,
+        "value": "restricted"
+      },
+      "params": {},
+      "message": "Restricted content (secrets/credentials) may not be sent to AI tools.",
+      "tags": []
+    },
+    {
+      "rule_id": "confidential-warn",
+      "name": "Warn on confidential content",
+      "description": "Confidential-class content (PII, medical, security, government) raises a high-risk warning; connectors escalate this to a local block.",
+      "enabled": true,
+      "severity": "high",
+      "priority": 10,
+      "action": "warn",
+      "min_confidence": 0.8,
+      "match": {
+        "detector": "classification",
+        "op": "at_least",
+        "min_count": null,
+        "value": "confidential"
+      },
+      "params": {},
+      "message": "Confidential content detected — sending this to an AI tool violates policy.",
+      "tags": []
+    },
+    {
+      "rule_id": "internal-warn",
+      "name": "Alert on internal content",
+      "description": "Internal-class content (internal memos, HR, legal, source code) requires explicit acknowledgement.",
+      "enabled": true,
+      "severity": "medium",
+      "priority": 20,
+      "action": "warn",
+      "min_confidence": 0.8,
+      "match": {
+        "detector": "classification",
+        "op": "at_least",
+        "min_count": null,
+        "value": "internal"
+      },
+      "params": {},
+      "message": "Internal content detected — confirm before sending to an AI tool.",
+      "tags": []
+    }
+  ],
+  "signature": {
+    "alg": "ed25519",
+    "key_id": "local-dev",
+    "value": "83KRWuwGy6b0vvv4x7b3nAIdqBn/Uj984z7l80Yfx3AlbHWsOmGLqyUZv0AA4PRMUZyrEq5A7Z7IqTbxtRVPCg=="
+  }
+}

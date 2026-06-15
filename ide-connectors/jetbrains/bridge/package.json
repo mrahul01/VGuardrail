@@ -1,0 +1,28 @@
+{
+  "name": "@vguardrail/jetbrains-bridge",
+  "version": "0.1.0",
+  "description": "One-shot stdin/stdout bridge between the VGuardrail JetBrains plugin and the connector-sdk (xpc-bridge → agent → policy engine). Reads one JSON request line, prints one JSON decision line, exits 0.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.js",
+  "bin": {
+    "vguardrail-jetbrains-bridge": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vguardrail/connector-sdk": "file:../../../connector-sdk"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}

@@ -1,0 +1,84 @@
+# ---------------------------------------------------------------------------
+# Build artifacts
+# ---------------------------------------------------------------------------
+# Rust
+target/
+**/target/
+
+# Swift
+.build/
+**/.build/
+*.swiftpm
+.swiftpm/
+
+# Node
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+*.tsbuildinfo
+
+# Next.js / dashboard
+.next/
+**/.next/
+out/
+**/out/
+
+# Test coverage
+coverage/
+**/coverage/
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# ---------------------------------------------------------------------------
+# Secrets & environment (NEVER commit these)
+# ---------------------------------------------------------------------------
+# Ignore all env files and backups, but keep the shareable templates.
+.env
+.env.*
+*.env
+*.bak
+!.env.example
+!.env.sample
+!.env.template
+
+# Keys / certificates / credentials
+*.key
+*.pem
+*.p12
+*.pfx
+*.keystore
+id_rsa
+*.identity
+.vguardrail/
+
+# Terraform state & vars (may contain secrets)
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+tfplan
+*.tfplan
+crash.log
+
+# ---------------------------------------------------------------------------
+# Local runtime data & logs
+# ---------------------------------------------------------------------------
+*.log
+*.pt
+*.bin
+data/
+dynamodb_data/
+minio_data/
+.tmp_*
+
+# ---------------------------------------------------------------------------
+# OS / editor cruft
+# ---------------------------------------------------------------------------
+.DS_Store
+**/.DS_Store
+Thumbs.db

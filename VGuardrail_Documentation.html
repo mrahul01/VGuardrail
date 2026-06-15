@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VGuardrail — AI Governance Platform | Complete Documentation</title>
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{--pri:#0b6bcb;--pri-dk:#08529c;--pri-lt:#e8f0fe;--acc:#10b981;--warn:#f59e0b;--dngr:#ef4444;--txt:#1e293b;--txt2:#64748b;--bg:#f8fafc;--wh:#fff;--brd:#e2e8f0;--sh:0 1px 3px rgba(0,0,0,.08);--r:8px;--rl:12px;--mx:1200px}
+        html{scroll-behavior:smooth}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.6}
+        h1{font-size:2.5rem;font-weight:800;letter-spacing:-.02em}
+        h2{font-size:1.7rem;font-weight:700;margin:2rem 0 1rem;padding-bottom:.5rem;border-bottom:3px solid var(--pri)}
+        h3{font-size:1.2rem;font-weight:600;margin:1.5rem 0 .75rem;color:var(--pri-dk)}
+        h4{font-size:1.05rem;font-weight:600;margin:1rem 0 .5rem}
+        p,li{margin-bottom:.5rem}
+        a{color:var(--pri);text-decoration:none}
+        a:hover{text-decoration:underline}
+        code{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:.875em;font-family:'SF Mono','Fira Code',monospace}
+        pre{background:#1e293b;color:#e2e8f0;border-radius:var(--r);padding:1rem 1.25rem;overflow-x:auto;font-size:.85rem;line-height:1.5;margin:.75rem 0}
+        pre code{background:none;padding:0;color:inherit}
+        .hero{background:linear-gradient(135deg,#0b6bcb 0%,#1e40af 100%);color:#fff;padding:3rem 2rem;text-align:center}
+        .hero h1{font-size:3rem;margin-bottom:.5rem}
+        .hero p{font-size:1.2rem;opacity:.9;max-width:700px;margin:0 auto}
+        .hero .badge{display:inline-block;background:rgba(255,255,255,.15);padding:.25rem 1rem;border-radius:999px;font-size:.875rem;margin-top:1rem}
+        .container{max-width:var(--mx);margin:0 auto;padding:0 1.5rem}
+        .toc-wrapper{background:var(--wh);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
+        .toc{display:flex;gap:.25rem;overflow-x:auto;padding:.75rem 0;max-width:var(--mx);margin:0 auto}
+        .toc a{white-space:nowrap;padding:.4rem .9rem;border-radius:999px;font-size:.85rem;font-weight:500;color:var(--txt2);transition:all .15s;flex-shrink:0}
+        .toc a:hover,.toc a.active{background:var(--pri-lt);color:var(--pri);text-decoration:none}
+        .card{background:var(--wh);border-radius:var(--rl);padding:1.5rem;margin:1rem 0;box-shadow:var(--sh);border:1px solid var(--brd)}
+        .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin:1rem 0}
+        .stat-card{text-align:center;padding:1.25rem}
+        .stat-card .num{font-size:2rem;font-weight:800;color:var(--pri)}
+        .stat-card .label{font-size:.85rem;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em}
+        .table-wrapper{overflow-x:auto;margin:1rem 0}
+        table{width:100%;border-collapse:collapse;font-size:.9rem}
+        th,td{text-align:left;padding:.65rem .75rem;border-bottom:1px solid var(--brd)}
+        th{background:var(--pri-lt);font-weight:600;color:var(--pri-dk)}
+        tr:hover td{background:#f8fafc}
+        .tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+        .tag-green{background:#d1fae5;color:#065f46}.tag-yellow{background:#fef3c7;color:#92400e}.tag-red{background:#fee2e2;color:#991b1b}.tag-blue{background:#dbeafe;color:#1e40af}.tag-gray{background:#f1f5f9;color:#475569}
+        .status{display:inline-flex;align-items:center;gap:4px}
+        .status::before{content:'';width:8px;height:8px;border-radius:50%;display:inline-block}
+        .status.pass::before{background:var(--acc)}.status.fail::before{background:var(--dngr)}.status.partial::before{background:var(--warn)}
+        .arch-box{font-family:'SF Mono','Fira Code',monospace;font-size:.85rem;line-height:1.7;white-space:pre;overflow-x:auto;background:#0f172a;color:#e2e8f0;border-radius:var(--rl);padding:1.25rem}
+        @media(max-width:768px){h1{font-size:1.75rem}h2{font-size:1.35rem}.hero h1{font-size:2rem}.card-grid{grid-template-columns:1fr}.toc{gap:.15rem}.toc a{font-size:.8rem;padding:.3rem .7rem}}
+        .section{padding:1rem 0 2rem}hr{border:none;border-top:1px solid var(--brd);margin:2rem 0}
+        ul,ol{padding-left:1.5rem;margin:.5rem 0}li{margin-bottom:.25rem}
+        .footnote{font-size:.85rem;color:var(--txt2);margin-top:1rem}
+        .alert{padding:1rem 1.25rem;border-radius:var(--r);margin:1rem 0;border-left:4px solid}
+        .alert-warn{background:#fef3c7;border-color:#f59e0b}
+        .alert-info{background:#dbeafe;border-color:#3b82f6}
+        .alert-danger{background:#fee2e2;border-color:#ef4444}
+        .alert-success{background:#d1fae5;border-color:#10b981}
+        .flow{counter-reset:vgstep;list-style:none;padding-left:0;margin:1rem 0 .5rem}
+        .flow>li{counter-increment:vgstep;position:relative;padding:.1rem 0 1rem 3rem;border-left:2px dashed var(--brd);margin-left:1.1rem}
+        .flow>li:last-child{border-left-color:transparent;padding-bottom:.2rem}
+        .flow>li::before{content:counter(vgstep);position:absolute;left:-1.1rem;top:-.1rem;width:2.2rem;height:2.2rem;border-radius:50%;background:var(--pri);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.9rem;box-shadow:var(--sh)}
+        .flow>li strong{color:var(--pri-dk)}
+        .flow>li .hop{display:inline-block;font-family:'SF Mono','Fira Code',monospace;font-size:.8rem;color:var(--txt2);background:#f1f5f9;border-radius:4px;padding:1px 6px;margin-top:.15rem}
+        .flow.green{counter-reset:vgstep}.flow.green>li::before{background:var(--acc)}
+        .split{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+        @media(max-width:768px){.split{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+    <h1>VGuardrail</h1>
+    <p>Enterprise-Grade AI Governance & Audit Platform</p>
+    <div class="badge">Version 1.1 &nbsp;·&nbsp; Docker-based &nbsp;·&nbsp; Rust/Axum + Next.js &nbsp;·&nbsp; AWS Cloud &nbsp;·&nbsp; 24 Detection Categories</div>
+</header>
+
+<!-- TABLE OF CONTENTS -->
+<nav class="toc-wrapper">
+    <div class="toc">
+        <a href="#overview">Overview</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#agent">Endpoint Agent</a>
+        <a href="#policy-engine">Policy Engine</a>
+        <a href="#backend">Cloud Backend</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#connectors">Connectors</a>
+        <a href="#event-model">Event Model</a>
+        <a href="#database">Database</a>
+        <a href="#api">API Contracts</a>
+        <a href="#rbac">RBAC</a>
+        <a href="#security">Security</a>
+        <a href="#docker">Docker Stack</a>
+        <a href="#process-flow">Process Flow</a>
+        <a href="#how-to-run">How to Run</a>
+        <a href="#how-to-deploy">How to Deploy</a>
+        <a href="#testing">Testing</a>
+        <a href="#standards">Standards</a>
+    </div>
+</nav>
+
+<div class="container">
+
+<!-- ═══════════════ 1. OVERVIEW ═══════════════ -->
+<section id="overview" class="section">
+    <h2>1. Project Overview</h2>
+    <div class="card">
+        <h3>Mission</h3>
+        <p>Build an enterprise-grade AI governance and audit platform that monitors AI usage across browsers, IDEs, CLI tools, and API clients on macOS endpoints. The platform enforces organizational policies before data is sent to external AI providers and provides centralized auditing, compliance reporting, and security visibility.</p>
+    </div>
+    <div class="card-grid">
+        <div class="card stat-card"><div class="num">Swift 6</div><div class="label">Endpoint Agent</div></div>
+        <div class="card stat-card"><div class="num">Rust</div><div class="label">Backend + Policy Engine</div></div>
+        <div class="card stat-card"><div class="num">Next.js 14</div><div class="label">Security Dashboard</div></div>
+        <div class="card stat-card"><div class="num">24</div><div class="label">Detection Categories</div></div>
+        <div class="card stat-card"><div class="num"><50ms</div><div class="label">Policy Decision</div></div>
+        <div class="card stat-card"><div class="num">9</div><div class="label">CLI Tool Wrappers</div></div>
+    </div>
+    <div class="card">
+        <h3>Repository Structure</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Directory</th><th>Purpose</th><th>Technology</th></tr>
+                <tr><td><code>/agent</code></td><td>macOS endpoint agent (LaunchDaemon)</td><td>Swift 6, SwiftUI, XPC, SQLite</td></tr>
+                <tr><td><code>/policy-engine</code></td><td>Local policy evaluation engine</td><td>Rust, gRPC</td></tr>
+                <tr><td><code>/browser-connectors</code></td><td>Chrome/Edge/Brave/Firefox/Safari extensions</td><td>TypeScript, Manifest V3</td></tr>
+                <tr><td><code>/ide-connectors</code></td><td>VS Code family (Cursor/Windsurf/Trae/Antigravity), JetBrains, Xcode</td><td>TypeScript, Kotlin, Swift</td></tr>
+                <tr><td><code>/cli-connectors</code></td><td>9 wrappers: claude, gemini, codex, aider, ollama, llama, mlx, sgpt, gh-copilot</td><td>TypeScript, Node.js</td></tr>
+                <tr><td><code>/connector-sdk</code></td><td>Third-party connector SDK + Swift bridge</td><td>TypeScript, Swift</td></tr>
+                <tr><td><code>/backend/lambdas</code></td><td>Legacy Lambda handlers (Rust workspace)</td><td>Rust, cargo-lambda, ARM64</td></tr>
+                <tr><td><code>/backend/server</code></td><td><strong>New:</strong> Native HTTP server (replaces Lambda)</td><td>Rust, Axum, tokio</td></tr>
+                <tr><td><code>/backend/terraform</code></td><td>Infrastructure as Code (AWS)</td><td>Terraform</td></tr>
+                <tr><td><code>/dashboard</code></td><td>Security management dashboard</td><td>Next.js 14, TypeScript, Tailwind</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Non-Functional Requirements</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Requirement</th><th>Target</th></tr>
+                <tr><td>Availability</td><td>99.9%</td></tr>
+                <tr><td>Scalability</td><td>100,000+ endpoints</td></tr>
+                <tr><td>Policy Decision Latency</td><td><50 milliseconds</td></tr>
+                <tr><td>Audit Retention</td><td>7 years (S3 Object Lock COMPLIANCE)</td></tr>
+                <tr><td>Compliance</td><td>SOC2, ISO 27001, GDPR-ready</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 2. ARCHITECTURE ═══════════════ -->
+<section id="architecture" class="section">
+    <h2>2. System Architecture (Post-Docker Migration)</h2>
+
+    <div class="alert alert-info">
+        <strong>Architecture Update (Phase 8):</strong> VGuardrail has been migrated from API Gateway + 10 Lambdas to a two-container Docker stack (Rust/Axum + Next.js) fronted by Caddy for TLS. The data plane (DynamoDB, S3, KMS, Cognito) remains unchanged — only the edge/API plane was replaced.
+    </div>
+
+    <div class="card">
+        <h3>Production Topology</h3>
+        <div class="arch-box">
+┌──────────────────────────────────────────────────────────────────────┐
+│                    Public Internet                                   │
+│                          │                                           │
+│                          ▼                                           │
+│         ┌────────────────────────────────────────────┐              │
+│         │         Caddy :80 / :443                   │              │
+│         │  - Let's Encrypt auto-issue / auto-renew   │              │
+│         │  - HTTP → HTTPS redirect                   │              │
+│         │  - JSON access logs → CloudWatch           │              │
+│         │  - rate_limit(200 rps) on api.*            │              │
+│         └────────────────────────────────────────────┘              │
+│               │                         │                          │
+│               ▼                         ▼                          │
+│  vguardrail.verisync.digital    api.verisync.digital               │
+│  ┌────────────────────────┐    ┌──────────────────────────────┐    │
+│  │  Dashboard (Next.js)   │    │  Backend (Rust/Axum)         │    │
+│  │  :3000                 │    │  :8080                       │    │
+│  │  BFF + RBAC + UI       │◄──►│  RS256 JWT (Cognito JWKS)   │    │
+│  └────────────────────────┘    └──────────────────────────────┘    │
+│         │              internal http://backend:8080                 │
+│         └──────────── shared `vguardrail-net` ────────────┘        │
+│                              │                                      │
+│                              ▼                                      │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │                    AWS Data Plane (unchanged)                │   │
+│  │  Cognito · DynamoDB (core + audit) · S3 (audit archive)     │   │
+│  │  KMS · Secrets Manager · CloudWatch                          │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  macOS Endpoints ◄──── gRPC (UDS) ──── Connectors (browser/IDE/CLI)│
+│  vguardiand Agent         │                                        │
+│  Local Policy Engine ◄────┘                                        │
+│  (pe-engined, Rust)                                                │
+└─────────────────────────────────────────────────────────────────────┘
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Migration Summary</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Metric</th><th>Before (Lambda)</th><th>After (Docker)</th></tr>
+                <tr><td>Edge components</td><td>API Gateway + JWT authorizer + 10 Lambdas</td><td>Caddy (TLS) + 2 containers</td></tr>
+                <tr><td>Cold-start cost</td><td>Yes (Lambda init)</td><td>No (long-lived tokio process)</td></tr>
+                <tr><td>Routes defined in</td><td>Terraform</td><td>Rust <code>axum::Router</code></td></tr>
+                <tr><td>AuthN layer</td><td>API Gateway JWT authorizer</td><td><code>server::auth::cognito_jwt</code> (RS256 + JWKS)</td></tr>
+                <tr><td>Build artifact</td><td>10 per-function zips (arm64)</td><td>1 OCI image (multi-stage, distroless)</td></tr>
+                <tr><td>Local dev</td><td>LocalStack + cargo-lambda</td><td><code>docker compose -f docker-compose.dev.yml up</code></td></tr>
+                <tr><td>Business logic</td><td>Unchanged</td><td>Unchanged (<code>app</code> crate reused as-is)</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 3. ENDPOINT AGENT ═══════════════ -->
+<section id="agent" class="section">
+    <h2>3. macOS Endpoint Agent</h2>
+    <div class="card">
+        <h3>Architecture</h3>
+        <div class="arch-box">
+ vgctl / connectors / menu bar ──XPC──► vguardiand (LaunchDaemon)
+                                          │  AgentCore (actor)
+                                          ├─ PolicyEngineClient ─(UDS)─► pe-engined
+                                          ├─ EventQueue (SQLite, agent-owned)
+                                          ├─ Policy sync ─ LoadPolicy ─► pe-engined
+                                          └─ Upload worker ─(HTTPS)─► Backend
+        </div>
+    </div>
+    <div class="card">
+        <h3>Agent Modules</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Target</th><th>Kind</th><th>Description</th></tr>
+                <tr><td><code>VGCore</code></td><td>Library</td><td>Wire-stable models, AuditEvent, identity, UUIDv7</td></tr>
+                <tr><td><code>VGSQLite</code></td><td>Library</td><td>libsqlite3 wrapper, SQLCipher-ready (AES-256)</td></tr>
+                <tr><td><code>VGEventQueue</code></td><td>Library</td><td>Actor over SQLite: queue state machine</td></tr>
+                <tr><td><code>VGXPCProtocol</code></td><td>Library</td><td>@objc AgentControl, codec, AgentXPCClient</td></tr>
+                <tr><td><code>VGAgentCore</code></td><td>Library</td><td>Orchestration actor + loopback double</td></tr>
+                <tr><td><code>VGGRPCClient</code></td><td>Library</td><td>grpc-swift v2 client (gated <code>VG_GRPC=1</code>)</td></tr>
+                <tr><td><code>vguardiand</code></td><td>Executable</td><td>The daemon: XPC listener + workers</td></tr>
+                <tr><td><code>VGuardrailMenuBar</code></td><td>Executable</td><td>SwiftUI MenuBarExtra status app</td></tr>
+                <tr><td><code>vgctl</code></td><td>Executable</td><td>Dev CLI / prompt-submission</td></tr>
+                <tr><td><code>vgselfcheck</code></td><td>Executable</td><td>Runtime verification (35 checks)</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Device Registration & Inventory</h3>
+        <ul>
+            <li><strong>Quick facts at registration:</strong> friendly computer name, hardware model, OS version, console user, FQDN — the server derives the IP itself (client-claimed addresses would be spoofable).</li>
+            <li><strong>Process inventory via libproc:</strong> <code>proc_listallpids</code> + <code>proc_pidinfo</code> (start time, uid) + <code>proc_pidpath</code> + <code>KERN_PROCARGS2</code> for the <em>full command line</em>; GUI apps sorted first, capped at 300.</li>
+            <li><strong>Browser-extension inventory:</strong> Chrome/Edge/Brave manifest scan (with <code>__MSG_</code> locale-name resolution) + Firefox <code>extensions.json</code>.</li>
+            <li><strong>Cadence:</strong> registered + snapshot at startup, refreshed every 10 minutes when <code>VG_UPLOAD_URL</code> is set; <code>vguardiand --inventory-once</code> for a one-shot run (installers/verification). Never blocks enforcement.</li>
+        </ul>
+    </div>
+    <div class="card">
+        <h3>Security Posture</h3>
+        <ul>
+            <li><strong>Privacy:</strong> Audit events built from engine's <em>redacted</em> response; raw prompts never queued or uploaded.</li>
+            <li><strong>Fail-closed:</strong> Unavailable engine → no decision; missing policy → WARN; unsigned policy rejected; XPC peers rejected without code requirement.</li>
+            <li><strong>At rest:</strong> Event signing key + identity at <code>0600</code> permissions; SQLCipher (AES-256) for queue DB.</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ═══════════════ 4. POLICY ENGINE ═══════════════ -->
+<section id="policy-engine" class="section">
+    <h2>4. Local Policy Engine</h2>
+
+    <div class="card">
+        <h3>Detection Categories (24)</h3>
+        <p>Deterministic, redaction-safe detectors cover every category below; wire names are snake_case and synchronized across the engine, gRPC proto, Swift agent, connector SDK, backend, and dashboard.</p>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Category</th><th>Examples detected</th></tr>
+                <tr><td><code>secret</code></td><td>AWS keys, GitHub/JWT/API tokens, SSH keys, credentialed DB connection strings, internal IPs (RFC-1918), AWS ARNs/account IDs, internal domains</td></tr>
+                <tr><td><code>pii</code></td><td>Emails, phones, customer IDs, credit cards (Luhn), SSNs</td></tr>
+                <tr><td><code>source_code</code></td><td>Rust/Python/Swift/JS/TS/Go/Java + config formats (YAML, JSON, TOML, INI, Dockerfile, shell, .env)</td></tr>
+                <tr><td><code>company_confidential</code> / <code>intellectual_property</code> / <code>financial</code></td><td>Project codenames, roadmaps, proprietary algorithms, P&amp;L / revenue data</td></tr>
+                <tr><td><code>prompt_injection</code> / <code>usage_policy</code></td><td>Jailbreaks (DAN-style), hidden-system-prompt extraction, restricted-use phrases</td></tr>
+                <tr><td><code>customer_data</code> / <code>sensitive_document</code> / <code>compliance</code> / <code>keyword</code> / <code>file_policy</code> / <code>image_policy</code></td><td>CRM exports, bulk emails, GDPR/HIPAA/PCI triggers, watched keywords, embedded files/images</td></tr>
+                <tr><td><code>destructive_command</code></td><td>rm&nbsp;-rf, raw-device dd, mkfs/shred, permission bombs, curl|sh, fork bombs, DROP DATABASE — always <strong>Critical</strong></td></tr>
+                <tr><td><code>legal</code> · <code>medical</code> · <code>hr</code> · <code>security</code> · <code>research_development</code> · <code>communication</code> · <code>procurement</code> · <code>government</code></td><td>Attorney-client privilege, patient records/PHI, salary bands, pentest reports/zero-days, unpublished research, board minutes, vendor contracts, ITAR/FOUO/classified markers</td></tr>
+                <tr><td><code>ai_classification</code></td><td>Synthetic aggregate finding carrying the 0–100 risk score and tier</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Decision Pipeline</h3>
+        <div class="arch-box">
+detectors (24 categories) ─► risk score 0–100 + tier
+   (safe / low / sensitive / confidential / restricted)
+        │
+        ├─► Granite Guardian 3.0 2B (optional, llama.cpp)  — raise-only tier
+        │   refinement + category attribution; grammar-constrained output
+        ├─► Code classifier (optional, fine-tuned CodeBERT) — only when the
+        │   source-code/config gate fired; sensitive ≥0.8 → Confidential floor
+        ▼
+signed-bundle rule evaluation (DSL, ed25519) ─► critical force-block
+        ▼
+ALLOW / WARN / BLOCK + redacted findings + reason</div>
+        <ul>
+            <li><strong>Raise-only & fail-open refinement:</strong> the LLM and code classifier can only raise the rule-based risk tier, never lower it; any transport/parse failure falls back to the deterministic score.</li>
+            <li><strong>Critical force-block:</strong> any Critical finding (AWS key, destructive command, credentialed connection string) overrides an Allow/Warn rule outcome — unless an approved, time-bounded exception applies.</li>
+            <li><strong>Config:</strong> <code>VG_DETECTOR_CONFIG</code> (YAML, unknown keys rejected) for org keyword lists, domain phrase lists, thresholds; <code>VG_LLM_ENDPOINT</code>/<code>VG_LLM_TIMEOUT_MS</code> (default 2500&nbsp;ms) and <code>VG_CODE_CLASSIFIER_ENDPOINT</code>/<code>VG_CODE_CLASSIFIER_TIMEOUT_MS</code> for the optional refinement stages.</li>
+        </ul>
+    </div>
+
+    <div class="card-grid">
+        <div class="card">
+            <h4>🧠 Granite Guardian 3.0 2B (self-hosted)</h4>
+            <ul>
+                <li>IBM's purpose-built risk/safety classifier (Apache-2.0)</li>
+                <li>Served locally via llama.cpp (GGUF Q4_K_M, ~1.6&nbsp;GB) — data never leaves your infrastructure</li>
+                <li><code>./provision-policy-rules.sh</code> downloads the model; compose profile <code>llm</code> serves it on :8090</li>
+                <li>Verdict cache (prompt-hash) amortizes repeat scans</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>⚡ Policy Actions</h4>
+            <ul>
+                <li><span class="tag tag-green">ALLOW</span> Prompt forwarded normally</li>
+                <li><span class="tag tag-yellow">WARN</span> Low risk: notice · Medium: interactive acknowledge · High/Critical: hard block</li>
+                <li><span class="tag tag-red">BLOCK</span> Prompt prevented from leaving the device (fail-closed when any hop is down)</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 5. CLOUD BACKEND ═══════════════ -->
+<section id="backend" class="section">
+    <h2>5. Cloud Backend</h2>
+    <div class="card">
+        <h3>New Rust Server (<code>backend/server/</code>)</h3>
+        <p>The <code>server</code> crate is a thin Axum transport layer over the existing <code>app</code> crate business logic. It implements all 32 API routes, RS256 Cognito JWT verification via JWKS, and runs as a long-lived tokio process inside a Docker container.</p>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Module</th><th>Purpose</th></tr>
+                <tr><td><code>config.rs</code></td><td>Env-driven ServerConfig (same <code>VG_*</code> vars the Lambdas used)</td></tr>
+                <tr><td><code>state.rs</code></td><td>AppState: AWS clients + JWKS cache</td></tr>
+                <tr><td><code>auth.rs</code></td><td>Cognito RS256 + JWKS middleware</td></tr>
+                <tr><td><code>router.rs</code></td><td>Axum router + global layers (tracing, timeout, body limit, request ID)</td></tr>
+                <tr><td><code>routes/agent.rs</code></td><td><code>/health</code>, <code>/devices/register</code>, <code>/devices/inventory</code>, <code>/policies/latest</code>, <code>/events/batch</code></td></tr>
+                <tr><td><code>routes/scan.rs</code></td><td><code>POST /scan</code> — runs the <strong>real 24-category detector pipeline in-process</strong> (+ optional Granite Guardian via <code>VG_LLM_ENDPOINT</code>); used by the browser extension's HTTP transport in local dev</td></tr>
+                <tr><td><code>routes/admin_*.rs</code></td><td>All <code>/admin/*</code> routes (stats, devices + per-device inventory/events, audit, policies, exceptions, users, settings) with free-text <code>search</code> support. Note: axum 0.7 — path params are <code>/:id</code></td></tr>
+                <tr><td><code>error.rs</code></td><td>ApiErrorResponse (byte-identical JSON envelope)</td></tr>
+                <tr><td><code>request_ctx.rs</code></td><td>RequestContext / AdminRequestContext</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>AWS Services Used</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Service</th><th>Purpose</th></tr>
+                <tr><td>Cognito User Pools</td><td>Authentication (RS256 JWT), RBAC groups, device identity</td></tr>
+                <tr><td>DynamoDB</td><td>Core data store (devices, policies, users, settings) + Audit events</td></tr>
+                <tr><td>S3</td><td>Immutable audit archive (Object Lock COMPLIANCE, 7-year retention)</td></tr>
+                <tr><td>KMS (CMK)</td><td>Encryption at rest for all data stores, automatic annual rotation</td></tr>
+                <tr><td>Secrets Manager</td><td>Enrollment secrets</td></tr>
+                <tr><td>CloudWatch</td><td>Logging, monitoring, alerting</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Audit Integrity — Tamper-Evident Chain</h3>
+        <p>Each event has <code>event_hash = SHA-256(canonical_content ‖ previous_event_hash)</code>, linked per device. Chain advance + deduplication is a single DynamoDB <code>TransactWriteItems</code> (atomic). <code>upload_id</code> replays provide whole-batch idempotency; <code>event_id</code> conditional writes prevent duplicates.</p>
+    </div>
+</section>
+
+<!-- ═══════════════ 6. DASHBOARD ═══════════════ -->
+<section id="dashboard" class="section">
+    <h2>6. Security Dashboard</h2>
+    <div class="card">
+        <h3>Route Structure</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Route</th><th>Description</th><th>Auth</th></tr>
+                <tr><td><code>/login</code></td><td>Cognito Hosted UI / custom login</td><td>❌</td></tr>
+                <tr><td><code>/dashboard</code></td><td>System overview — stats, charts, violations</td><td>✅</td></tr>
+                <tr><td><code>/devices</code></td><td>Device inventory — list, search, filter; user / hardware-OS / IP columns</td><td>✅</td></tr>
+                <tr><td><code>/devices/[id]</code></td><td>Device detail — quick facts header + tabs: <strong>Processes</strong> (name, PID, user, started, active-for, full command), <strong>Extensions</strong> (per-browser), <strong>Events</strong> (the device's own prompt/audit timeline)</td><td>✅</td></tr>
+                <tr><td><code>/policies</code></td><td>Policy management — list/detail with rules, version history, publish status</td><td>✅</td></tr>
+                <tr><td><code>/violations</code></td><td>Violation list — filters (severity/decision/source/category/date), category + reason columns, device <em>hostname</em> links to the device page</td><td>✅</td></tr>
+                <tr><td><code>/exceptions</code></td><td>Exception management — create, approve/reject</td><td>✅</td></tr>
+                <tr><td><code>/audit</code></td><td>Audit event search — filters, chain verification</td><td>✅</td></tr>
+                <tr><td><code>/settings</code></td><td>Org settings — enrollment, retention, users</td><td>✅</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Recent Enhancements (June 2026)</h3>
+        <ul>
+            <li><strong>Global search:</strong> the topbar search queries devices, policies, and violations together (debounced, grouped results) and navigates directly; list pages also honor <code>?search=</code>.</li>
+            <li><strong>Event ↔ device mapping:</strong> violations and audit rows show the device <em>hostname</em> (not just the ID) linking to its detail page; the device page's Events tab gives the reverse view.</li>
+            <li><strong>Top Policy Categories KPI</strong> + category/reason columns across violations and audit.</li>
+            <li><strong>Policies page fixed:</strong> backend now returns full summaries (name, default action, rule count, created/published) with lifecycle-status mapping.</li>
+        </ul>
+    </div>
+    <div class="card">
+        <h3>Key Changes in Docker Migration</h3>
+        <ul>
+            <li><strong>New backend client:</strong> <code>dashboard/lib/api/backend-client.ts</code> — HTTP client for <code>http://backend:8080</code></li>
+            <li><strong>Middleware fixed:</strong> HS256 verify removed; backend is now the authoritative JWT verifier (RS256 + JWKS)</li>
+            <li><strong>Legacy fallback:</strong> <code>VG_LEGACY_GATEWAY=1</code> flag preserves old API Gateway client for emergency rollback</li>
+            <li><strong>Standalone output:</strong> <code>next.config.js</code> uses <code>output: 'standalone'</code> for Docker</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ═══════════════ 7. CONNECTORS ═══════════════ -->
+<section id="connectors" class="section">
+    <h2>7. Connectors</h2>
+    <div class="card-grid">
+        <div class="card"><h3>🌐 Browser</h3><p>Chrome, Edge, Brave, Firefox, Safari (Xcode-wrapped) — one shared MV3 extension gates prompts on ChatGPT, Claude, Gemini, Copilot, Perplexity. Transport: native messaging host → agent, HTTP <code>/scan</code> fallback in local dev. <strong>Fail-closed.</strong></p></div>
+        <div class="card"><h3>💻 IDE</h3><p>One shared extension for VS Code, Cursor, Windsurf, Trae, Antigravity (per-IDE .vsix packaging); JetBrains plugin (scan actions + decision-history tool window); Xcode Source Editor Extension. Zed is honestly <em>not</em> supported (no VS Code extension compatibility) — covered at the agent/CLI layer. <strong>TypeScript / Kotlin / Swift</strong></p></div>
+        <div class="card"><h3>📟 CLI</h3><p>Nine wrappers: <code>vg-claude</code>, <code>vg-gemini</code>, <code>vg-codex</code>, <code>vg-aider</code>, <code>vg-ollama</code>, <code>vg-llama</code>, <code>vg-mlx</code>, <code>vg-sgpt</code>, <code>vg-gh-copilot</code>. Prompt extracted per-tool, scanned, then the real binary runs with arguments forwarded verbatim. <code>--bypass</code>/<code>VG_BYPASS=1</code> audited escape hatch; installer with optional shell-alias shadowing. <strong>TypeScript</strong></p></div>
+        <div class="card"><h3>🔌 SDK</h3><p>TypeScript SDK + signed Swift xpc-bridge for building connectors. Models validated with zod; <code>safeScan()</code> maps agent unavailability to a fail-closed BLOCK. <strong>TypeScript + Swift</strong></p></div>
+    </div>
+</section>
+
+<!-- ═══════════════ 8. EVENT MODEL ═══════════════ -->
+<section id="event-model" class="section">
+    <h2>8. Event Model</h2>
+    <div class="card">
+        <h3>Event Structure</h3>
+        <pre><code>{
+  "event_id": "uuidv7",  "timestamp": "2026-06-09T07:00:00Z",
+  "user_id": "user-abc",  "device_id": "device-def",
+  "source": "browser|ide|cli|api",  "provider": "claude|openai|gemini",
+  "model": "claude-sonnet-4-20260501",  "decision": "allow|warn|block",
+  "risk_level": "low|medium|high|critical"
+}</code></pre>
+    </div>
+    <div class="card">
+        <h3>Event Types</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Event</th><th>Description</th></tr>
+                <tr><td><code>PromptSubmitted</code></td><td>User sends a prompt</td></tr>
+                <tr><td><code>PolicyEvaluated</code></td><td>Policy engine evaluation complete</td></tr>
+                <tr><td><code>PromptAllowed</code></td><td>Prompt forwarded successfully</td></tr>
+                <tr><td><code>PromptBlocked</code></td><td>Prompt prevented from leaving device</td></tr>
+                <tr><td><code>PolicyViolation</code></td><td>Rule violation detected</td></tr>
+                <tr><td><code>UploadSuccess / UploadFailure</code></td><td>Cloud upload result</td></tr>
+                <tr><td><code>AgentStarted</code></td><td>Agent startup event</td></tr>
+                <tr><td><code>PolicyUpdated</code></td><td>New policy downloaded</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 9. DATABASE ═══════════════ -->
+<section id="database" class="section">
+    <h2>9. Database Schema</h2>
+    <div class="card">
+        <h3>DynamoDB Tables</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Table</th><th>Key Pattern</th><th>Purpose</th></tr>
+                <tr><td><code>vguardrail-core</code></td><td>PK: <code>ORG#<id></code>, SK: <code>DEVICE#</code>/<code>POLICY#</code>/<code>USER#</code>/<code>EXCEPTION#</code>/<code>SETTINGS#</code></td><td>All core entities (single-table design)</td></tr>
+                <tr><td><code>vguardrail-audit</code></td><td>PK: <code>ORG#<id></code>, SK: <code>EVENT#<timestamp></code>/<code>VIOLATION#<ts></code></td><td>Audit events + violations</td></tr>
+                <tr><td>S3 Audit Archive</td><td>Object Lock COMPLIANCE</td><td>Immutable raw event batches (7-year retention)</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 10. API ═══════════════ -->
+<section id="api" class="section">
+    <h2>10. API Contracts (32 Routes)</h2>
+    <div class="card">
+        <h3>Agent-Facing Endpoints</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+                <tr><td>GET</td><td><code>/health</code></td><td>None</td><td>Liveness check</td></tr>
+                <tr><td>POST</td><td><code>/devices/register</code></td><td>Enrollment token</td><td>Device registration → Cognito + DynamoDB</td></tr>
+                <tr><td>GET</td><td><code>/policies/latest</code></td><td>JWT</td><td>Policy download (ETag, 304)</td></tr>
+                <tr><td>POST</td><td><code>/events/batch</code></td><td>JWT</td><td>Event ingestion (idempotent, hash-chained)</td></tr>
+                <tr><td>POST</td><td><code>/devices/inventory</code></td><td>JWT</td><td>Process/extension inventory snapshot (latest wins)</td></tr>
+                <tr><td>POST</td><td><code>/scan</code></td><td>JWT / dev headers</td><td>Prompt evaluation through the real detector pipeline (+ optional LLM); records a dashboard audit event</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Dashboard Admin Endpoints (28 routes)</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Method</th><th>Path</th><th>Roles</th></tr>
+                <tr><td>GET</td><td><code>/admin/stats</code></td><td>viewer+</td></tr>
+                <tr><td>GET/DELETE</td><td><code>/admin/devices[/{id}]</code> (+ <code>?search=</code>)</td><td>viewer+ (delete: admin+)</td></tr>
+                <tr><td>GET</td><td><code>/admin/devices/{id}/inventory</code> · <code>/admin/devices/{id}/events</code></td><td>viewer+</td></tr>
+                <tr><td>GET</td><td><code>/admin/violations[/{id}]</code> (+ <code>?search=&category=</code>)</td><td>viewer+</td></tr>
+                <tr><td>GET</td><td><code>/admin/audit[/{id}[/chain]]</code> (+ <code>?search=&device_id=</code>)</td><td>viewer+</td></tr>
+                <tr><td>GET/POST/PUT/DELETE</td><td><code>/admin/policies[/{id}[/publish|/versions]]</code></td><td>viewer+ (write: admin+)</td></tr>
+                <tr><td>GET/POST/PUT</td><td><code>/admin/exceptions[/{id}[/approve|/reject|/history]]</code></td><td>viewer+ (write: admin+)</td></tr>
+                <tr><td>GET/POST/DELETE</td><td><code>/admin/users[/{id}]</code></td><td>admin+</td></tr>
+                <tr><td>GET/PUT</td><td><code>/admin/settings</code></td><td>admin+</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Request/Response Examples</h3>
+        <h4>Health Check</h4>
+        <pre><code>GET /health
+→ 200 {"status":"healthy","version":"0.1.0","time":"2026-06-09T08:00:00Z"}</code></pre>
+        <h4>Device Registration</h4>
+        <pre><code>POST /devices/register
+Headers: x-enrollment-token: org-id.random-token
+Body:    {"device_id":"d-001","hostname":"mbp-001","platform":"macos","agent_version":"0.1.0"}
+→ 200 {"status":"registered","org_id":"org-001","access_token":"...","expires_in":3600}</code></pre>
+        <h4>Event Upload</h4>
+        <pre><code>POST /events/batch
+Body:    {"upload_id":"upl-001","events":[{"event_id":"evt-001","device_id":"d-001","timestamp_ms":1234567890,"event_type":"PromptBlocked","severity":"high","details":{}}]}
+→ 200 {"accepted":1,"rejected":0,"upload_id":"upl-001","replayed":false}</code></pre>
+    </div>
+</section>
+
+<!-- ═══════════════ 11. RBAC ═══════════════ -->
+<section id="rbac" class="section">
+    <h2>11. Role-Based Access Control</h2>
+    <div class="card">
+        <h3>Roles & Hierarchy</h3>
+        <pre><code>super_admin  → can create: super_admin, org_admin, auditor, viewer
+org_admin    → can create: auditor, viewer (CANNOT create org_admin or super_admin)
+auditor      → CANNOT create users
+viewer       → CANNOT create users</code></pre>
+    </div>
+    <div class="card">
+        <h3>Page-Level Access Matrix</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Page</th><th>Super Admin</th><th>Org Admin</th><th>Auditor</th><th>Viewer</th></tr>
+                <tr><td>/dashboard</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                <tr><td>/devices</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                <tr><td>/policies</td><td>✅</td><td>✅</td><td>R</td><td>❌</td></tr>
+                <tr><td>/violations</td><td>✅</td><td>✅</td><td>✅</td><td>R</td></tr>
+                <tr><td>/exceptions</td><td>✅</td><td>✅</td><td>R</td><td>❌</td></tr>
+                <tr><td>/audit</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td></tr>
+                <tr><td>/settings</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td></tr>
+                <tr><td>Org Switcher</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Enforcement Layers (Defense in Depth)</h3>
+        <ol>
+            <li><strong>Backend (RS256 JWT + JWKS)</strong> — Authoritative JWT verification with role/org extraction from Cognito claims</li>
+            <li><strong>BFF Layer (Next.js API Routes)</strong> — Server-side route protection before proxying to backend</li>
+            <li><strong>Frontend UI (React)</strong> — Conditional rendering, hidden/disabled unauthorized actions</li>
+        </ol>
+    </div>
+</section>
+
+<!-- ═══════════════ 12. SECURITY ═══════════════ -->
+<section id="security" class="section">
+    <h2>12. Security & Threat Model</h2>
+    <div class="card">
+        <h3>Security Controls</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Control</th><th>Status</th><th>Notes</th></tr>
+                <tr><td>Encryption at Rest (DynamoDB, S3)</td><td><span class="status pass"></span> PASS</td><td>SSE-KMS with customer-managed CMK</td></tr>
+                <tr><td>Encryption in Transit</td><td><span class="status pass"></span> PASS</td><td>TLS 1.2+ everywhere, Caddy auto-certs</td></tr>
+                <tr><td>Immutable Audit Trail</td><td><span class="status pass"></span> PASS</td><td>S3 Object Lock COMPLIANCE (7yr), hash chains</td></tr>
+                <tr><td>JWT Verification</td><td><span class="status pass"></span> PASS</td><td>Backend RS256 + JWKS (fixed from old HS256)</td></tr>
+                <tr><td>Key Rotation</td><td><span class="status pass"></span> PASS</td><td>KMS automatic annual rotation</td></tr>
+                <tr><td>Security Headers</td><td><span class="status pass"></span> PASS</td><td>Caddy: HSTS, CSP, X-Frame-Options, nosniff</td></tr>
+                <tr><td>Rate Limiting</td><td><span class="status pass"></span> PASS</td><td>Caddy rate_limit (200 rps) on API</td></tr>
+                <tr><td>WAF</td><td><span class="status fail"></span> TODO</td><td>Not yet deployed — pending production cut-over</td></tr>
+                <tr><td>MFA for Admins</td><td><span class="status partial"></span> PARTIAL</td><td>Optional TOTP in Cognito; not enforced</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Critical Vulnerabilities (Original Audit)</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>ID</th><th>Vulnerability</th><th>CVSS</th><th>Current Status</th></tr>
+                <tr><td>VULN-001</td><td>JWT Algorithm Confusion (HS256 vs RS256)</td><td><span class="tag tag-red">9.1</span></td><td><span class="tag tag-green">FIXED</span> Backend now uses RS256 + JWKS</td></tr>
+                <tr><td>VULN-002</td><td>Org Admin Privilege Escalation</td><td><span class="tag tag-red">8.8</span></td><td><span class="tag tag-yellow">PENDING</span> Needs org-scoped enforcement</td></tr>
+                <tr><td>VULN-005</td><td>No MFA for Human Administrators</td><td><span class="tag tag-red">7.5</span></td><td><span class="tag tag-yellow">PARTIAL</span> Optional TOTP available</td></tr>
+                <tr><td>VULN-006</td><td>No WAF on Public API</td><td><span class="tag tag-red">7.5</span></td><td><span class="tag tag-yellow">PENDING</span> Planned for production</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 13. DOCKER STACK ═══════════════ -->
+<section id="docker" class="section">
+    <h2>13. Docker Stack</h2>
+    <div class="card">
+        <h3>Files Overview</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>File</th><th>Purpose</th></tr>
+                <tr><td><code>docker-compose.yml</code></td><td>Production service definitions (backend + dashboard)</td></tr>
+                <tr><td><code>docker-compose.dev.yml</code></td><td>Dev variant with hot-reload (cargo-watch + next dev)</td></tr>
+                <tr><td><code>docker-compose.override.yml</code></td><td>Auto-generated by <code>run.sh</code> / <code>setup.sh</code> — publishes ports, injects AWS creds</td></tr>
+                <tr><td><code>backend/Dockerfile</code></td><td>Multi-stage Rust build (rust:1.96 → distroless runtime)</td></tr>
+                <tr><td><code>dashboard/Dockerfile</code></td><td>Multi-stage Next.js build (node:20-alpine → standalone output)</td></tr>
+                <tr><td><code>Caddyfile</code></td><td>Reverse proxy + TLS + rate limit + security headers</td></tr>
+                <tr><td><code>.env</code> / <code>.env.example</code></td><td>Environment configuration (AWS creds, resource names, Cognito)</td></tr>
+                <tr><td><code>run.sh</code></td><td>One-shot launcher: build + up + health-check</td></tr>
+                <tr><td><code>setup.sh</code></td><td>Full bootstrap: AWS creds, build, start, wait for health, optional admin creation</td></tr>
+                <tr><td><code>deploy-prod.sh</code></td><td>Production deploy: ECR push + Terraform + Cognito callback setup</td></tr>
+                <tr><td><code>bootstrap-admin.sh</code></td><td>Creates initial admin user in Cognito</td></tr>
+                <tr><td><code>seed-dev-data.sh</code></td><td>Seeds sample data into DynamoDB for development</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Network Topology</h3>
+        <pre><code>┌──────────────────┐     HTTP      ┌──────────────────┐
+│   Caddy :443     │ ──────────►   │  dashboard :3000 │
+│  (TLS + routing) │               │  (Next.js BFF)   │
+│                  │ ──────────►   │                  │
+│  vguardrail.     │               └────────┬─────────┘
+│  api.            │                        │ HTTP
+│  verisync.       │                        │ (internal)
+│  digital         │               ┌────────▼─────────┐
+│                  │ ──────────►   │  backend :8080   │
+└──────────────────┘               │  (Rust/Axum)     │
+                                   └────────┬─────────┘
+                                            │ HTTPS
+                                   ┌────────▼─────────┐
+                                   │  AWS Cloud       │
+                                   │  DynamoDB / S3   │
+                                   │  Cognito / KMS   │
+                                   └──────────────────┘</code></pre>
+    </div>
+</section>
+
+<!-- ═══════════════ 14. HOW TO RUN ═══════════════ -->
+<section id="process-flow" class="section">
+    <h2>14. Process Flow — Step by Step</h2>
+
+    <div class="alert alert-info">
+        This section traces <strong>exactly how a request flows through VGuardrail, step by step</strong>, in the
+        two ways the system runs: the <strong>Local stack</strong> (single machine, no AWS — for development and
+        demos) and the <strong>Production / real-time deployment</strong> (endpoint agents + AWS cloud). The
+        components are the same; what differs is the <em>enforcement path</em> (HTTP <code>/scan</code> vs. XPC→gRPC),
+        the <em>authentication</em> (dev headers vs. Cognito JWT), and where <em>audit</em> data lands
+        (in-memory store vs. DynamoDB + S3 hash chain).
+    </div>
+
+    <!-- ─────────────── LOCAL ─────────────── -->
+    <div class="card">
+        <h3>A. Local Running — flow (single machine, no AWS)</h3>
+        <p>Goal: run the entire detection + dashboard pipeline on one Mac with <strong>no AWS account</strong>.
+        Authentication is bypassed (<code>VG_DEV_CLAIMS=1</code> / <code>DISABLE_AUTH=true</code>); detection runs
+        <em>in-process inside the backend</em> via the <code>POST /scan</code> endpoint.</p>
+
+        <h4>A.1 — Bring-up sequence (what starts, in order)</h4>
+        <ol class="flow">
+            <li><strong><code>./start-local.sh</code></strong> launches the local Docker stack from
+                <code>docker-compose.local.yml</code>: <span class="hop">dynamodb-local:8000</span>
+                <span class="hop">minio:9000</span> <span class="hop">mock-jwks</span>
+                <span class="hop">backend:8080 (VG_DEV_CLAIMS=1)</span>. The backend builds the in-process
+                <code>DetectorRegistry</code> (24 categories) once at startup.</li>
+            <li><strong>Dashboard</strong> starts on <span class="hop">localhost:3000</span> via
+                <code>npm run dev</code> with <code>DISABLE_AUTH=true</code> (mock <code>super_admin</code>; no Cognito).</li>
+            <li><strong>Endpoint chain (optional, for agent/CLI tests)</strong> — two user LaunchAgents:
+                <code>pe-engined</code> on the UDS <code>/tmp/vguardrail/policy.sock</code> and
+                <code>vguardiand</code> owning the XPC service <code>com.vguardrail.agent.xpc</code>.</li>
+            <li><strong>(Optional) Granite Guardian LLM</strong> — <code>./provision-policy-rules.sh</code> then the
+                <code>llm</code> compose profile; set <code>VG_LLM_ENDPOINT</code> to enable raise-only refinement.</li>
+            <li><strong><code>./seed-local-data.sh</code></strong> loads demo devices / policies / users / inventory so
+                the dashboard has content.</li>
+        </ol>
+
+        <h4>A.2 — Runtime request flow (one prompt, end to end)</h4>
+        <ol class="flow green">
+            <li><strong>User submits a prompt</strong> in a connected surface — a browser AI site (ChatGPT/Claude/
+                Gemini), an IDE command, or a <code>vg-*</code> CLI wrapper.</li>
+            <li><strong>Connector intercepts pre-send.</strong> The browser content-script gate cancels the submit at
+                the capture phase; the CLI wrapper extracts the prompt before exec; the IDE/Claude hook fires on
+                submit. Nothing has left the machine yet.</li>
+            <li><strong>Connector calls <code>POST /scan</code></strong> on the backend
+                <span class="hop">http://localhost:8080/scan</span> with headers
+                <code>x-vg-org-id</code> + <code>x-device-id</code> (JWT skipped because <code>VG_DEV_CLAIMS=1</code>).
+                Any attached file is sent base64 in <code>files[]</code>.</li>
+            <li><strong>Backend runs the real detector pipeline in-process</strong>:
+                <code>DetectorRegistry.scan_all</code> → <code>classify_risk</code> → optional Granite Guardian
+                <code>refine</code> (raise-only). File attachments are extracted first (PDF / Office / ZIP) under an
+                800&nbsp;ms hybrid cap and folded into the same evaluation.</li>
+            <li><strong>A <code>Decision</code> is returned</strong> — <code>action</code>, <code>risk_score</code>,
+                <code>confidence</code>, <code>findings</code>, <code>reason</code>.</li>
+            <li><strong>The connector enforces locally:</strong>
+                <span class="tag tag-green">ALLOW</span> forward the prompt ·
+                <span class="tag tag-yellow">WARN</span> low = notice, medium = "Send anyway", high = hard block ·
+                <span class="tag tag-red">BLOCK</span> the prompt never leaves the device.</li>
+            <li><strong>The backend records an audit event</strong> in its in-memory dev store
+                (<code>DEV_AUDIT_STORE</code>) — redacted findings only, never raw content.</li>
+            <li><strong>The dashboard reads it</strong> via <code>GET /admin/audit</code> /
+                <code>/admin/devices</code> at <span class="hop">localhost:3000</span> — violations, devices, audit.</li>
+        </ol>
+
+        <div class="arch-box">
+ USER prompt / file
+      │  (1) intercept pre-send
+      ▼
+ ┌─────────────────────────┐     (3) HTTP  POST /scan        ┌──────────────────────────────┐
+ │  Connector              │ ───── x-vg-org-id, x-device-id ─►│  Backend :8080 (VG_DEV_CLAIMS) │
+ │  browser / IDE / CLI    │      {text, files[base64]}      │  ── in-process detection ──    │
+ │  (gate / wrapper / hook)│                                 │  DetectorRegistry.scan_all     │
+ └─────────────────────────┘                                 │  → classify_risk               │
+      ▲  (5) Decision JSON                                   │  → Granite Guardian (optional) │
+      │  action/risk/findings ◄──────────────────────────────│  → extract PDF/Office/ZIP      │
+      │                                                       └───────────────┬────────────────┘
+      │  (6) enforce ALLOW / WARN / BLOCK                                     │ (7) audit (in-memory)
+      ▼                                                                       ▼
+ prompt sent  ·  or blocked on device                          Dashboard :3000  ── (8) GET /admin/audit
+        </div>
+        <p class="footnote">Local mode is detection-as-a-service over HTTP: there is no Cognito, no DynamoDB, no
+        signed policy bundle — the backend itself is the policy engine and the audit store.</p>
+    </div>
+
+    <!-- ─────────────── PRODUCTION ─────────────── -->
+    <div class="card">
+        <h3>B. Production / Real-Time Deployment — flow (endpoints + AWS cloud)</h3>
+        <p>Goal: enforce policy <strong>on the device in real time</strong> (the prompt is evaluated by the
+        <em>local</em> policy engine over XPC→gRPC, so a block never touches the network), and ship a
+        <strong>tamper-evident audit trail</strong> to the cloud over authenticated HTTPS.</p>
+
+        <h4>B.1 — Bring-up sequence (one-time / per release)</h4>
+        <ol class="flow">
+            <li><strong>Provision AWS infra</strong> with Terraform — DynamoDB (core + audit), S3 (audit archive,
+                Object Lock), Cognito (user pool + app clients), KMS, Secrets Manager, Route 53 + ACM.</li>
+            <li><strong>Build &amp; push images</strong> to ECR, then deploy <strong>backend</strong> and
+                <strong>dashboard</strong> on ECS Fargate behind <strong>Caddy</strong> (auto Let's Encrypt TLS,
+                rate-limit on <code>api.*</code>).</li>
+            <li><strong>Install endpoints.</strong> On each managed Mac, <code>vguardiand</code> and
+                <code>pe-engined</code> run as signed LaunchDaemons; the signed policy bundle (ed25519) is pinned;
+                browser/IDE/CLI connectors are installed.</li>
+            <li><strong>Enroll the device.</strong> <code>POST /devices/register</code> with an enrollment token →
+                the backend returns a <strong>Cognito JWT</strong> the agent stores for authenticated uploads.</li>
+        </ol>
+
+        <h4>B.2 — Real-time enforcement flow (one prompt, on the device)</h4>
+        <ol class="flow">
+            <li><strong>User submits a prompt</strong> in a connected app; the connector intercepts it pre-send.</li>
+            <li><strong>Connector → XPC</strong> to <code>vguardiand</code> on
+                <code>com.vguardrail.agent.xpc</code>. The daemon validates the caller's code signature
+                (signed-peer check) before accepting.</li>
+            <li><strong>vguardiand → gRPC over UDS</strong> to <code>pe-engined</code>
+                (<span class="hop">/var/run/vguardrail/policy.sock</span>), the local policy engine running the
+                pinned, signature-verified policy bundle.</li>
+            <li><strong>pe-engined decides in &lt;50&nbsp;ms</strong>: 24-category detectors → risk score → optional
+                LLM refine → <code>Decision</code>. <strong>Fail-closed:</strong> if any hop (XPC, gRPC, engine) is
+                down, the connector blocks.</li>
+            <li><strong>Connector enforces on the device:</strong>
+                <span class="tag tag-green">ALLOW</span> ·
+                <span class="tag tag-yellow">WARN</span> (tiered) ·
+                <span class="tag tag-red">BLOCK</span> — on block the prompt <em>never leaves the machine</em>.</li>
+            <li><strong>vguardiand signs an audit event</strong> (ed25519) and enqueues it in an offline-first
+                SQLite queue — capture and enforcement never depend on the network.</li>
+            <li><strong>Upload worker batches events</strong> and POSTs them over HTTPS to
+                <span class="hop">api.verisync.digital/events/batch</span> with the device's
+                <code>Authorization: Bearer &lt;JWT&gt;</code>.</li>
+            <li><strong>Caddy terminates TLS</strong> and proxies to the backend
+                <span class="hop">:8080</span>, which <strong>verifies the Cognito RS256 JWT</strong> against the
+                pool's JWKS before accepting anything.</li>
+            <li><strong>Backend appends to the tamper-evident hash chain</strong> — each event links to the prior
+                (<code>h<sub>i</sub> = SHA-256(e<sub>i</sub> ‖ h<sub>i-1</sub>)</code>) — writing the chain head +
+                records to <strong>DynamoDB</strong> and the raw signed batch to <strong>S3</strong> (Object Lock).</li>
+            <li><strong>Security team observes</strong> via the dashboard: Caddy → Next.js BFF → Cognito login →
+                backend <code>/admin/*</code> (RBAC) → devices, violations, exceptions, and audit-chain verification.</li>
+        </ol>
+
+        <div class="arch-box">
+ USER prompt / file
+      │  (1) intercept pre-send
+      ▼
+ ┌──────────────┐  (2) XPC   ┌──────────────┐  (3) gRPC/UDS  ┌────────────────────┐
+ │  Connector   │ ─────────► │  vguardiand  │ ─────────────► │  pe-engined        │
+ │ browser/IDE/ │  signed    │  (agent)     │  policy.sock   │  LOCAL policy engine│
+ │ CLI          │  peer chk  │              │ ◄───────────── │  24 detectors+LLM   │
+ └──────────────┘ ◄───────── └──────┬───────┘  (4) Decision  └────────────────────┘
+      │  (5) enforce ALLOW/WARN/BLOCK│         &lt;50ms · fail-closed
+      ▼                              │ (6) sign + enqueue (offline-first SQLite)
+ prompt sent · or blocked            │ (7) batch upload  HTTPS + Bearer JWT
+ on device                           ▼
+                          ┌───────────────────────┐  (8) TLS   ┌──────────────────────────┐
+                          │  Caddy :443           │ ─────────► │  Backend :8080 (ECS)      │
+                          │  Let's Encrypt        │            │  verify Cognito RS256 JWT │
+                          └───────────────────────┘            │  (9) hash-chain append    │
+                                                               └─────────┬─────────────────┘
+                                                  ┌──────────────────────┼───────────────────┐
+                                                  ▼                      ▼                   ▼
+                                            DynamoDB (audit)        S3 (Object Lock)    DynamoDB (core)
+                                                  ▲
+                          Security team ── (10) Dashboard (Caddy → Next.js BFF → /admin/*, RBAC)
+        </div>
+        <p class="footnote">Production splits responsibilities: <strong>enforcement is real-time and local</strong>
+        (XPC→gRPC, decision in &lt;50&nbsp;ms, fail-closed) while <strong>audit is authenticated and durable</strong>
+        (offline-first queue → JWT-verified HTTPS → hash-chained DynamoDB + S3).</p>
+    </div>
+
+    <!-- ─────────────── COMPARISON ─────────────── -->
+    <div class="card">
+        <h3>C. Local vs Production — the same pipeline, two paths</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Step</th><th>Local running</th><th>Production / real-time</th></tr>
+                <tr><td>Where detection runs</td><td>In-process in the backend (<code>/scan</code>)</td><td>On the device in <code>pe-engined</code> (local engine)</td></tr>
+                <tr><td>Connector → engine path</td><td>HTTP <code>POST /scan</code></td><td>XPC → <code>vguardiand</code> → gRPC/UDS → <code>pe-engined</code></td></tr>
+                <tr><td>Authentication</td><td>Bypassed (<code>VG_DEV_CLAIMS=1</code>, dev headers)</td><td>Cognito RS256 JWT (JWKS-verified) for uploads</td></tr>
+                <tr><td>Policy source</td><td>Built-in default detectors (no bundle)</td><td>Pinned, ed25519-signed policy bundle</td></tr>
+                <tr><td>Enforcement latency</td><td>HTTP round-trip on localhost</td><td>&lt;50&nbsp;ms, in-process gRPC; fail-closed</td></tr>
+                <tr><td>Audit storage</td><td>In-memory dev store (<code>DEV_AUDIT_STORE</code>)</td><td>Hash-chained DynamoDB + raw batches in S3 (Object Lock)</td></tr>
+                <tr><td>Offline behaviour</td><td>N/A (single host)</td><td>Capture + enforce work offline; events queue in SQLite and upload later</td></tr>
+                <tr><td>Dashboard auth</td><td><code>DISABLE_AUTH=true</code> (mock super_admin)</td><td>Cognito login → BFF → backend RBAC</td></tr>
+                <tr><td>Bring-up</td><td><code>./start-local.sh</code> + <code>./seed-local-data.sh</code></td><td>Terraform → ECR push → ECS/Caddy → enroll devices</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 15. HOW TO RUN ═══════════════ -->
+<section id="how-to-run" class="section">
+    <h2>15. How to Run (Development)</h2>
+
+    <div class="alert alert-success">
+        <strong>Prerequisites:</strong> Docker Engine ≥ 24 with Compose v2, AWS CLI v2 with credentials for the dev account, the <code>.env</code> file populated.
+    </div>
+
+    <div class="card">
+        <h3>Option 0: Fully Local Stack — no AWS account needed (recommended for development)</h3>
+        <pre><code># DynamoDB-local + MinIO + backend (docker-compose.local.yml) + dashboard
+./start-local.sh
+
+# Seed demo devices / policies / users / inventory
+./seed-local-data.sh
+
+# Dashboard (local mode, DISABLE_AUTH=true → mock super_admin)
+open http://localhost:3000
+
+# Optional: Granite Guardian LLM refinement (downloads ~1.6 GB GGUF once)
+./provision-policy-rules.sh
+docker compose -f docker-compose.local.yml --profile llm up -d llm
+# then uncomment VG_LLM_ENDPOINT in docker-compose.local.yml under backend: and restart it
+
+# Test the real detection pipeline directly
+curl -s -X POST http://localhost:8080/scan -H 'Content-Type: application/json' \
+  -H 'x-device-id: dev-001' -H 'x-vg-org-id: local-org' \
+  -d '{"text":"Patient John Doe diagnosed with Type 2 diabetes","context":{"provider":"chatgpt"}}'
+# → {"decision":{"action":"warn", ... "category":"medical" ...}}</code></pre>
+        <div class="alert alert-warn" style="margin-bottom:0">
+            <strong>Important:</strong> backend rebuilds for the local stack must use
+            <code>docker compose -f docker-compose.local.yml build backend</code> — the default
+            <code>docker-compose.yml</code> reads <code>.env</code> and targets the <em>real AWS dev environment</em>.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Option A: Quick Start (AWS-backed)</h3>
+        <pre><code># 1. Clone the repo
+git clone <repo-url> VGuardrail && cd VGuardrail
+
+# 2. Copy and configure environment
+cp .env.example .env
+# Edit .env — set AWS resource names + optionally AWS creds
+# For local dev, you can just enable VG_DEV_CLAIMS=1
+
+# 3. Run everything (builds + starts + health-checks)
+./run.sh
+
+# OR: full bootstrap with admin user creation
+./setup.sh --bootstrap
+
+# 4. Verify
+curl -s http://localhost:8080/health    # Backend
+open http://localhost:3000               # Dashboard
+
+# 5. Stop
+./run.sh down</code></pre>
+    </div>
+
+    <div class="card">
+        <h3>Option B: Docker Compose (manual)</h3>
+        <pre><code># Dev mode with hot-reload
+docker compose -f docker-compose.dev.yml up
+
+# Backend: http://localhost:8080
+# Dashboard: http://localhost:3000
+
+# Production-like mode (builds images)
+docker compose build
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop
+docker compose down</code></pre>
+    </div>
+
+    <div class="card">
+        <h3>Option C: With Caddy TLS (production-like locally)</h3>
+        <pre><code># Build and start all services including Caddy
+docker compose build
+docker compose up -d caddy backend dashboard
+
+# Caddy auto-obtains Let's Encrypt certs on first request
+# Dashboard: https://vguardrail.verisync.digital
+# API: https://api.verisync.digital</code></pre>
+    </div>
+
+    <div class="card">
+        <h3>Useful Development Commands</h3>
+        <pre><code># Smoke test the backend
+curl -s http://localhost:8080/health
+
+# Test admin route (with dev claims enabled)
+curl -s -H 'x-vg-org-id: org-default' \
+     -H 'x-vg-role: org_admin' \
+     http://localhost:8080/admin/stats | jq
+
+# Seed sample data into DynamoDB
+./seed-dev-data.sh
+
+# Bootstrap an admin user in Cognito
+./bootstrap-admin.sh
+
+# Follow logs
+./run.sh logs
+
+# Watch backend logs only
+docker compose logs -f backend</code></pre>
+    </div>
+
+    <div class="card">
+        <h3>Environment Variables Reference</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Variable</th><th>Required</th><th>Description</th></tr>
+                <tr><td><code>AWS_REGION</code></td><td>Yes</td><td>AWS region (default: us-east-1)</td></tr>
+                <tr><td><code>AWS_ACCESS_KEY_ID</code></td><td>Yes*</td><td>AWS access key (*or ECS task role)</td></tr>
+                <tr><td><code>AWS_SECRET_ACCESS_KEY</code></td><td>Yes*</td><td>AWS secret key</td></tr>
+                <tr><td><code>VG_CORE_TABLE</code></td><td>Yes</td><td>DynamoDB core table name</td></tr>
+                <tr><td><code>VG_AUDIT_TABLE</code></td><td>Yes</td><td>DynamoDB audit table name</td></tr>
+                <tr><td><code>VG_AUDIT_BUCKET</code></td><td>Yes</td><td>S3 audit archive bucket</td></tr>
+                <tr><td><code>VG_USER_POOL_ID</code></td><td>Yes</td><td>Cognito user pool ID</td></tr>
+                <tr><td><code>VG_APP_CLIENT_ID</code></td><td>Yes</td><td>Cognito device app client ID</td></tr>
+                <tr><td><code>VG_DASHBOARD_CLIENT_ID</code></td><td>Yes</td><td>Cognito dashboard app client ID</td></tr>
+                <tr><td><code>VG_COGNITO_ISSUER</code></td><td>Yes</td><td>Cognito issuer URL for JWKS</td></tr>
+                <tr><td><code>VG_POLICY_PUBKEY</code></td><td>Optional</td><td>Base64 Ed25519 pubkey for policy verification</td></tr>
+                <tr><td><code>VG_DETECTOR_CONFIG</code></td><td>Optional</td><td>Path to detector-tuning YAML (keywords, domain phrases, thresholds)</td></tr>
+                <tr><td><code>VG_LLM_ENDPOINT</code> / <code>VG_LLM_TIMEOUT_MS</code></td><td>Optional</td><td>llama.cpp host:port for Granite Guardian refinement (timeout default 2500 ms)</td></tr>
+                <tr><td><code>VG_CODE_CLASSIFIER_ENDPOINT</code> / <code>VG_CODE_CLASSIFIER_TIMEOUT_MS</code></td><td>Optional</td><td>Fine-tuned code classifier endpoint (TEI-style <code>/predict</code>)</td></tr>
+                <tr><td><code>VG_DEV_CLAIMS</code></td><td>Dev only</td><td>Set to 1 for local dev (bypasses JWT, trusts x-vg-role/x-vg-org-id headers). NEVER in prod.</td></tr>
+                <tr><td><code>NEXT_PUBLIC_COGNITO_DOMAIN</code></td><td>Yes</td><td>Cognito hosted UI domain</td></tr>
+                <tr><td><code>NEXT_PUBLIC_COGNITO_CLIENT_ID</code></td><td>Yes</td><td>Dashboard client ID (public)</td></tr>
+                <tr><td><code>COGNITO_ISSUER</code></td><td>Yes</td><td>Dashboard JWT issuer</td></tr>
+                <tr><td><code>COGNITO_CLIENT_SECRET</code></td><td>Yes</td><td>Dashboard confidential client secret</td></tr>
+                <tr><td><code>COGNITO_REDIRECT_URI</code></td><td>Yes</td><td>OAuth callback URL</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ 15. HOW TO DEPLOY ═══════════════ -->
+<section id="how-to-deploy" class="section">
+    <h2>16. How to Deploy (Production)</h2>
+
+    <div class="alert alert-warn">
+        <strong>Pre-requisites:</strong> AWS account with provisioned infrastructure (DynamoDB, S3, Cognito, KMS), ACM certificate for the domain, ECR repos created.
+    </div>
+
+    <div class="card">
+        <h3>Deployment Topology</h3>
+        <div class="arch-box">
+┌─────────────────────────────────────────────────────────────────┐
+│                    Route 53 (verisync.digital)                   │
+│     A: vguardrail.verisync.digital / api.verisync.digital       │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  Caddy (TLS terminator)                         │
+│          Let's Encrypt auto-issue / auto-renew                  │
+│          rate_limit(200 rps) on api.*                           │
+└───────────────┬─────────────────────────┬───────────────────────┘
+                │                         │
+                ▼                         ▼
+┌─────────────────────┐       ┌─────────────────────┐
+│  Dashboard (Next.js)│       │  Backend (Rust/Axum)│
+│  ECS Fargate        │       │  ECS Fargate        │
+└─────────────────────┘       └─────────────────────┘</code></pre>
+    </div>
+
+    <div class="card">
+        <h3>Step-by-Step Production Deployment</h3>
+        <h4>Stage 1: Prepare Infrastructure</h4>
+        <pre><code># Ensure AWS infra is provisioned via Terraform
+cd backend/terraform/stacks/prod
+terraform init
+terraform plan -var-file=terraform.tfvars
+terraform apply -var-file=terraform.tfvars
+
+# Verify Cognito JWKS endpoint
+curl -s https://cognito-idp.us-east-1.amazonaws.com/<pool-id>/.well-known/jwks.json | jq .keys[0].kid</code></pre>
+
+        <h4>Stage 2: Bootstrap Admin User</h4>
+        <pre><code># Create the initial admin in Cognito
+./bootstrap-admin.sh <user-pool-id> admin@yourcompany.com 'SecureP@ss!' org-001</code></pre>
+
+        <h4>Stage 3: Build & Push Docker Images</h4>
+        <pre><code># Login to ECR
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin <account>.dkr.ecr.us-east-1.amazonaws.com
+
+# Build and push backend
+docker build -f backend/Dockerfile -t <ecr>/vguardrail/backend:latest .
+docker push <ecr>/vguardrail/backend:latest
+
+# Build and push dashboard
+docker build -f dashboard/Dockerfile -t <ecr>/vguardrail/dashboard:latest .
+docker push <ecr>/vguardrail/dashboard:latest</code></pre>
+
+        <h4>Stage 4: Deploy with Terraform (ECS Fargate)</h4>
+        <pre><code># Or use the deploy script
+./deploy-prod.sh
+
+# Or plan only first
+./deploy-prod.sh --plan</code></pre>
+
+        <h4>Stage 5: Verify</h4>
+        <pre><code># Health check
+curl -fsSL https://api.verisync.digital/health
+
+# Dashboard loads
+curl -I https://vguardrail.verisync.digital/login
+
+# Enrollment test
+curl -fsSL -X POST https://api.verisync.digital/devices/register \
+  -H 'x-enrollment-token: <token>' \
+  -H 'content-type: application/json' \
+  -d '{"device_id":"d-001","hostname":"test","platform":"macos","agent_version":"0.1.0"}'
+
+# Event ingestion
+curl -fsSL -X POST https://api.verisync.digital/events/batch \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'content-type: application/json' \
+  -d '{"upload_id":"test-001","events":[{"event_id":"evt-001","device_id":"d-001","timestamp_ms":1234567890,"event_type":"test","severity":"info","details":{}}]}'</code></pre>
+    </div>
+
+    <div class="card">
+        <h3>Rollout Strategy (Incremental)</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Stage</th><th>Action</th><th>Duration</th></tr>
+                <tr><td>0</td><td>Code in repo, no AWS changes</td><td>Done</td></tr>
+                <tr><td>1</td><td>Deploy to staging behind Caddy; verify with e2e suite</td><td>1 week</td></tr>
+                <tr><td>2</td><td>Shadow: run Docker in parallel with API Gateway; compare responses</td><td>1 week</td></tr>
+                <tr><td>3</td><td>Cut-over: flip dashboard to <code>BACKEND_API_URL=https://api.verisync.digital</code></td><td>Immediate</td></tr>
+                <tr><td>4</td><td>Cleanup: remove old Lambdas/API Gateway after one release cycle</td><td>1 cycle</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Rollback Plan</h3>
+        <pre><code># Emergency: revert dashboard to API Gateway
+docker compose set dashboard BACKEND_API_URL=https://<api-gateway-id>.execute-api.us-east-1.amazonaws.com
+docker compose up -d dashboard
+
+# The VG_LEGACY_GATEWAY=1 flag preserves old API Gateway client code</code></pre>
+    </div>
+
+    <div class="card">
+        <h3>Disaster Recovery</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Component</th><th>RTO</th><th>RPO</th></tr>
+                <tr><td>Backend + Dashboard (ECS)</td><td>15 min</td><td>0 (stateless containers)</td></tr>
+                <tr><td>DynamoDB (core + audit)</td><td>30 min</td><td>0 (PITR backup)</td></tr>
+                <tr><td>S3 Audit Archive</td><td>60 min</td><td>0 (versioned + Object Lock)</td></tr>
+                <tr><td>Cognito User Pool</td><td>60 min</td><td>0 (AWS managed)</td></tr>
+                <tr><td>Container Images (ECR)</td><td>5 min</td><td>0 (immutable tags)</td></tr>
+                <tr><td>Caddy Data Volume</td><td>30 min</td><td>Back up <code>/data</code> for Let's Encrypt creds</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Smoke Test Checklist</h3>
+        <ul>
+            <li>✅ <code>docker compose up -d</code> brings both services online</li>
+            <li>✅ <code>GET /health</code> returns 200 within 10s</li>
+            <li>✅ Dashboard loads at <code>https://vguardrail.verisync.digital</code></li>
+            <li>✅ Enrollment with real secret issues a Cognito JWT</li>
+            <li>✅ <code>GET /policies/latest</code> returns 304 on ETag match and 200 on miss</li>
+            <li>✅ <code>POST /events/batch</code> ingests events; chain head advances; raw batch in S3</li>
+            <li>✅ All existing tests pass</li>
+            <li>✅ CloudWatch access logs populate</li>
+            <li>✅ <code>GET /admin/stats</code> without JWT returns 401 (no body leak)</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ═══════════════ 16. TESTING ═══════════════ -->
+<section id="testing" class="section">
+    <h2>17. Testing Strategy</h2>
+    <div class="card">
+        <h3>Test Pyramid</h3>
+        <div class="arch-box">
+        ╱╲
+       ╱  ╲        E2E (5-10%) — Playwright
+      ╱    ╲
+     ╱──────╲
+    ╱        ╲     Integration (20-30%) — Next.js API routes, Lambda/Server handlers, DynamoDB
+   ╱          ╲
+  ╱────────────╲
+ ╱              ╲  Unit (60-70%) — React components, utility functions, RBAC logic
+╱                ╲
+        </div>
+    </div>
+    <div class="card">
+        <h3>Coverage Targets & Tools</h3>
+        <div class="table-wrapper">
+            <table>
+                <tr><th>Area</th><th>Target</th><th>Tool</th></tr>
+                <tr><td>React Components</td><td>90%</td><td>Vitest + @testing-library</td></tr>
+                <tr><td>Utility Functions</td><td>95%</td><td>Vitest</td></tr>
+                <tr><td>BFF API Routes</td><td>85%</td><td>Vitest (supertest)</td></tr>
+                <tr><td>Rust Lambda/Server Handlers</td><td>90%</td><td>cargo-tarpaulin</td></tr>
+                <tr><td>RBAC Enforcement</td><td>100%</td><td>Rust unit tests</td></tr>
+                <tr><td>Chain Verification</td><td>100%</td><td>Rust unit tests</td></tr>
+                <tr><td>E2E Critical Paths</td><td>100%</td><td>Playwright</td></tr>
+                <tr><td>Performance</td><td>Lighthouse 90+</td><td>Lighthouse CI</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Running Tests</h3>
+        <pre><code># Backend Rust tests (existing app crate)
+cd backend/lambdas && cargo test --workspace
+
+# Dashboard unit tests
+cd dashboard && npm run test
+
+# Dashboard e2e tests
+cd dashboard && npm run test:e2e
+
+# Full stack verification
+./run.sh && curl -s http://localhost:8080/health</code></pre>
+    </div>
+</section>
+
+<!-- ═══════════════ 17. STANDARDS ═══════════════ -->
+<section id="standards" class="section">
+    <h2>18. Coding Standards & Best Practices</h2>
+    <div class="card-grid">
+        <div class="card">
+            <h3>General Principles</h3>
+            <ul>
+                <li>Production-ready code only — no placeholders</li>
+                <li>Clean Architecture, SOLID Principles</li>
+                <li>Dependency Injection throughout</li>
+                <li>Interface-first design (port traits)</li>
+                <li>No hardcoded secrets</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Security</h3>
+            <ul>
+                <li>Validate all inputs (Zod / Serde)</li>
+                <li>Sanitize outputs, parameterized queries</li>
+                <li>Secrets in AWS Secrets Manager</li>
+                <li>No sensitive data in logs</li>
+                <li>Structured JSON logs only</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Git & CI/CD</h3>
+            <ul>
+                <li><code>main</code> → <code>develop</code> → <code>feature/*</code>, <code>hotfix/*</code></li>
+                <li>Required: Build, Tests, Security Scan, Lint, Dep Scan</li>
+                <li>Code review mandatory before merge</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Documentation</h3>
+            <ul>
+                <li>Exactly one <code>README.md</code> per top-level folder (9 total, repo root included) — no scattered reports</li>
+                <li>Architecture & operational details live in the owning folder's README</li>
+                <li>OpenAPI spec for all endpoints (<code>backend/openapi/openapi.yaml</code>)</li>
+                <li>This HTML file is the single consolidated platform reference</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<hr>
+<footer style="text-align:center;padding:2rem 0;color:var(--txt2);font-size:.875rem;">
+    <p>VGuardrail — AI Governance Platform &nbsp;·&nbsp; Complete Documentation</p>
+    <p>Generated from project documentation &nbsp;·&nbsp; Updated June 12, 2026 &nbsp;·&nbsp; 24-category engine · Granite Guardian · device inventory · 9 CLI wrappers</p>
+    <p style="margin-top:.5rem"><a href="#overview">Back to Top</a></p>
+</footer>
+
+</div><!-- /container -->
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+    const links=document.querySelectorAll('.toc a'),sections=document.querySelectorAll('.section');
+    const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.remove('active'));const l=document.querySelector(`.toc a[href="#${e.target.id}"]`);if(l)l.classList.add('active')}})},{rootMargin:'-80px 0px -60% 0px'});
+    sections.forEach(s=>obs.observe(s));
+});
+</script>
+
+</body>
+</html>

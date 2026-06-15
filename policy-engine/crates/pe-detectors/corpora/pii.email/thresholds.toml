@@ -1,0 +1,2 @@
+min_recall = 0.95
+min_precision = 0.95

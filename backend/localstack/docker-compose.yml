@@ -1,0 +1,12 @@
+# LocalStack for offline integration testing of the data-plane handlers.
+services:
+  localstack:
+    image: localstack/localstack:3
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb,s3,secretsmanager,lambda,iam,logs
+      - LAMBDA_RUNTIME_EXECUTOR=docker
+      - DEBUG=0
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"

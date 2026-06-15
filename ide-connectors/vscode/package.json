@@ -1,0 +1,103 @@
+{
+  "name": "vguardrail-ide",
+  "displayName": "VGuardrail",
+  "description": "VGuardrail DLP connector for VS Code-API IDEs (VS Code, Cursor, Windsurf, Trae, Antigravity). Scans prompts and pasted content against the local policy engine before they reach an AI provider.",
+  "version": "0.1.0",
+  "publisher": "vguardrail",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vguardrail.status",
+        "title": "VGuardrail: Show Status"
+      },
+      {
+        "command": "vguardrail.scanSelection",
+        "title": "VGuardrail: Scan Selection"
+      },
+      {
+        "command": "vguardrail.scanPrompt",
+        "title": "VGuardrail: Scan a Prompt"
+      },
+      {
+        "command": "vguardrail.toggleEnabled",
+        "title": "VGuardrail: Toggle Enabled"
+      }
+    ],
+    "configuration": {
+      "title": "VGuardrail",
+      "properties": {
+        "vguardrail.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Master switch for VGuardrail scanning in this IDE."
+        },
+        "vguardrail.passiveScan": {
+          "type": "boolean",
+          "default": true,
+          "description": "Passively scan paste-sized insertions (>200 characters) into open documents and surface a non-blocking warning when content would be flagged or blocked. Never blocks typing."
+        },
+        "vguardrail.transport": {
+          "type": "string",
+          "enum": [
+            "xpc",
+            "http-dev"
+          ],
+          "default": "xpc",
+          "enumDescriptions": [
+            "Production: signed xpc-bridge helper to the vguardiand agent (gRPC policy engine).",
+            "Local development: the dev backend's POST /scan on localhost (same real detector pipeline the browser extensions use). Requires the local stack (./start-local.sh)."
+          ],
+          "description": "How scans reach the policy engine. Changing this requires a window reload."
+        },
+        "vguardrail.devBackendUrl": {
+          "type": "string",
+          "default": "http://localhost:8080",
+          "description": "Dev backend base URL used when vguardrail.transport is \"http-dev\"."
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "vguardrail.scanSelection",
+        "key": "ctrl+shift+g",
+        "mac": "cmd+shift+g",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --target=node20",
+    "watch": "npm run build -- --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "package:vscode": "node scripts/package-vsix.mjs vscode",
+    "package:cursor": "node scripts/package-vsix.mjs cursor",
+    "package:windsurf": "node scripts/package-vsix.mjs windsurf",
+    "package:trae": "node scripts/package-vsix.mjs trae",
+    "package:antigravity": "node scripts/package-vsix.mjs antigravity"
+  },
+  "dependencies": {
+    "@vguardrail/connector-sdk": "file:../../connector-sdk"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.23.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}

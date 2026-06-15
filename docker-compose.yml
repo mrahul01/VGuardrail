@@ -1,0 +1,122 @@
+# VGuardrail — production-ish Docker Compose.
+#
+# This file is used for both local dev (`docker compose up`) and
+# the production cut-over (after Phase 7 / Caddy is in front of it).
+# For day-to-day development use `docker-compose.dev.yml` which
+# mounts source for hot-reload and skips AWS credentials.
+#
+# Architecture
+#   backend  — Rust server (replaces API Gateway + Lambda)
+#   dashboard — Next.js (BFF + UI; talks to `backend` for all data)
+#
+# Both services share a private network. The dashboard calls the
+# backend at `http://backend:8080` (internal DNS, not exposed).
+#
+# AWS credentials
+#   The backend uses the default AWS SDK credential chain:
+#     1. `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` env vars.
+#     2. ECS / EKS task role (when run on AWS infra).
+#     3. EC2 / Fargate instance profile.
+#   In development, drop a `~/.aws/credentials` file on the host and
+#   uncomment the `volumes` line under `backend`.
+#
+# Required environment variables
+#   See `.env.example` for the full set.
+
+name: vguardrail
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: vguardrail/backend:latest
+    container_name: vguardrail-backend
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      BIND_ADDR: "0.0.0.0:8080"
+      RUST_LOG: "${RUST_LOG:-info}"
+      # AWS resource names. Override per-environment in `.env`.
+      VG_CORE_TABLE: "${VG_CORE_TABLE}"
+      VG_AUDIT_TABLE: "${VG_AUDIT_TABLE}"
+      VG_AUDIT_BUCKET: "${VG_AUDIT_BUCKET}"
+      VG_USER_POOL_ID: "${VG_USER_POOL_ID}"
+      VG_APP_CLIENT_ID: "${VG_APP_CLIENT_ID}"
+      # Additional accepted JWT audience: the dashboard app client. Lets the
+      # server accept dashboard ID tokens alongside agent/device tokens.
+      VG_DASHBOARD_CLIENT_ID: "${VG_DASHBOARD_CLIENT_ID:-}"
+      VG_ENROLLMENT_PREFIX: "${VG_ENROLLMENT_PREFIX:-vguardrail/enrollment/}"
+      VG_POLICY_PUBKEY: "${VG_POLICY_PUBKEY:-}"
+      VG_COGNITO_ISSUER: "${VG_COGNITO_ISSUER:-}"
+      AWS_REGION: "${AWS_REGION:-us-east-1}"
+      REQUEST_TIMEOUT_S: "${REQUEST_TIMEOUT_S:-30}"
+      MAX_BODY_BYTES: "${MAX_BODY_BYTES:-6291456}"
+      # DO NOT set VG_DEV_CLAIMS=1 in production.
+      VG_DEV_CLAIMS: "${VG_DEV_CLAIMS:-0}"
+      # ── AWS credentials for DynamoDB access (dev) ──────────────────────────
+      AWS_ACCESS_KEY_ID: ""
+      AWS_SECRET_ACCESS_KEY: ""
+    env_file:
+      - .env
+    # The runtime image is distroless (no shell, no curl) and the server
+    # binary exposes no `--healthcheck` flag, so an in-container HEALTHCHECK
+    # is not feasible. Liveness/readiness is probed externally via
+    # `GET /health` (Caddy reverse proxy / the orchestrator). Disabling the
+    # container-level check avoids a guaranteed "unhealthy" status.
+    healthcheck:
+      disable: true
+    networks:
+      - vguardrail-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    image: vguardrail/dashboard:latest
+    container_name: vguardrail-dashboard
+    restart: unless-stopped
+    depends_on:
+      - backend
+    expose:
+      - "3000"
+    environment:
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+      NODE_ENV: "production"
+      # The BFF talks to the Rust server over the internal network.
+      # NOTE: lib/api/client.ts reads API_BASE_URL (not BACKEND_API_URL).
+      BACKEND_API_URL: "http://backend:8080"
+      API_BASE_URL: "http://backend:8080"
+      # ── Cognito Hosted-UI auth (read by lib/auth/cognito-client.ts + jwt.ts) ──
+      # NEXT_PUBLIC_* are read at runtime by the standalone server route handlers.
+      NEXT_PUBLIC_COGNITO_DOMAIN: "${NEXT_PUBLIC_COGNITO_DOMAIN:-}"
+      NEXT_PUBLIC_COGNITO_CLIENT_ID: "${NEXT_PUBLIC_COGNITO_CLIENT_ID:-}"
+      NEXT_PUBLIC_APP_URL: "${NEXT_PUBLIC_APP_URL:-http://localhost:3000}"
+      # Token issuer for RS256 verification (the cognito-idp URL, NOT the hosted-UI domain).
+      COGNITO_ISSUER: "${COGNITO_ISSUER:-}"
+      # Confidential dashboard client secret (server-only; used for the code→token exchange).
+      COGNITO_CLIENT_SECRET: "${COGNITO_CLIENT_SECRET:-}"
+      # Must exactly match a registered callback URL on the Cognito app client.
+      COGNITO_REDIRECT_URI: "${COGNITO_REDIRECT_URI:-http://localhost:3000/api/auth/callback/cognito}"
+    env_file:
+      - .env
+    networks:
+      - vguardrail-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+
+networks:
+  vguardrail-net:
+    driver: bridge

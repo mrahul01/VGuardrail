@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "VGuardrail Edge Connector",
+  "version": "0.1.0",
+  "description": "Evaluates AI prompts against organizational policy before they are submitted to ChatGPT, Claude, Gemini, and Perplexity.",
+  "minimum_chrome_version": "116",
+  "permissions": ["nativeMessaging", "storage"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://www.perplexity.ai/*",
+    "https://perplexity.ai/*",
+    "http://localhost:8080/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*",
+        "https://www.perplexity.ai/*",
+        "https://perplexity.ai/*"
+      ],
+      "js": ["content/content-script.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@vguardrail/chrome-native-host",
+  "version": "0.1.0",
+  "description": "Chrome Native Messaging host that bridges the VGuardrail Chrome extension to the connector-sdk (and thence the xpc-bridge → agent → policy-engine).",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "vguardrail-connector-host": "./dist/main.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vguardrail/connector-sdk": "file:../../../connector-sdk"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "eslint": "^9.9.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^2.0.5"
+  }
+}

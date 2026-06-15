@@ -1,0 +1,58 @@
+# VGuardrail Policy Engine — Cargo workspace.
+# Clean Architecture: pe-core is the dependency-free domain; adapters point inward.
+[workspace]
+resolver = "2"
+members = [
+    "crates/pe-core",
+    "crates/pe-dsl",
+    "crates/pe-detectors",
+    "crates/pe-store",
+    "crates/pe-grpc",
+    "crates/pe-engine",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.82"
+license = "Apache-2.0"
+authors = ["VGuardrail Engineering"]
+repository = "https://github.com/vguardrail/vguardrail"
+
+# Single source of truth for dependency versions across all crates.
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+thiserror = "1"
+regex = "1"
+once_cell = "1"
+base64 = "0.22"
+sha2 = "0.10"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+uuid = { version = "1", features = ["v7"] }
+rusqlite = { version = "0.31", features = ["bundled"] }
+tonic = "0.11"
+prost = "0.12"
+prost-types = "0.12"
+tonic-build = "0.11"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "net"] }
+tokio-stream = { version = "0.1", features = ["net"] }
+tracing = "0.1"
+
+# Internal crates.
+pe-core = { path = "crates/pe-core" }
+pe-dsl = { path = "crates/pe-dsl" }
+pe-detectors = { path = "crates/pe-detectors" }
+pe-store = { path = "crates/pe-store" }
+pe-grpc = { path = "crates/pe-grpc" }
+
+# Dev-only.
+criterion = "0.5"
+proptest = "1"
+tempfile = "3"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+panic = "abort"

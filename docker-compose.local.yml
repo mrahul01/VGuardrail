@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  mock-jwks:
+    image: node:20-alpine
+    command: node -e "const http=require('http');const server=http.createServer((req,res)=>{if(req.url.includes('jwks.json')){res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({keys:[]}));}else{res.writeHead(404);res.end();}});server.listen(8888,()=>console.log('Mock JWKS running'));"
+    ports:
+      - "8888:8888"
+    networks:
+      - vguardrail-local
+
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./dynamodb_data:/home/dynamodblocal/data
+    networks:
+      - vguardrail-local
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - ./minio_data:/data
+    networks:
+      - vguardrail-local
+
+  backend:
+    image: vguardrail/backend:latest
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - AWS_REGION=us-east-1
+      # The aws-sdk-rust admin adapters build their client via
+      # aws_config::load_defaults(), which honors the SDK-standard
+      # AWS_ENDPOINT_URL_* vars — NOT the legacy DYNAMODB_ENDPOINT/S3_ENDPOINT
+      # names below. Without these, the control-plane DynamoDB/S3 calls
+      # (devices, policies, exceptions, users, settings) escape to real AWS
+      # and fail with UnrecognizedClientException. Point them at the local
+      # emulators so the whole admin surface works offline.
+      - AWS_ENDPOINT_URL_DYNAMODB=http://dynamodb-local:8000
+      - AWS_ENDPOINT_URL_S3=http://minio:9000
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin
+      - S3_ENDPOINT=http://minio:9000
+      - S3_USE_PATH_STYLE=true
+      - VG_DEV_CLAIMS=1
+      - VG_USER_POOL_ID=local-mock-pool-id
+      - VG_APP_CLIENT_ID=local-mock-client-id
+      - VG_COGNITO_ISSUER=http://mock-jwks:8888
+      - VG_ENROLLMENT_TOKEN_SECRET=local-dev-token
+      - VG_CORE_TABLE=vguardrail-core-local
+      - VG_AUDIT_TABLE=vguardrail-audit-local
+      - VG_AUDIT_BUCKET=vguardrail-audit-local
+      - VG_S3_OBJECT_LOCK_DISABLED=1
+      # /scan runs the real detector pipeline (all 24 categories) in-process.
+      # Granite Guardian is OPTIONAL refinement: uncomment + start the `llm`
+      # profile to enable it (the container reaches the host's llama.cpp via
+      # host.docker.internal). The detectors work fully without it.
+      # - VG_LLM_ENDPOINT=host.docker.internal:8090
+      # - VG_LLM_TIMEOUT_MS=2500
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - dynamodb-local
+      - minio
+      - mock-jwks
+    networks:
+      - vguardrail-local
+
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - BACKEND_API_URL=http://backend:8080
+      - API_BASE_URL=http://backend:8080
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - DISABLE_AUTH=true
+      - VG_AUTH_MODE=mock
+      - NEXT_PUBLIC_COGNITO_DOMAIN=unused
+      - NEXT_PUBLIC_COGNITO_CLIENT_ID=unused
+      - NEXT_PUBLIC_COGNITO_ISSUER=https://unused
+      - NEXT_PUBLIC_BYPASS_AUTH=1
+    depends_on:
+      - backend
+    networks:
+      - vguardrail-local
+
+  # Optional local LLM for the policy engine's AI-classification refinement
+  # (category 15): IBM Granite Guardian 3.0 2B (Apache-2.0 risk classifier).
+  # The engine runs on the host, so the port is published; point it at the
+  # server with:
+  #   VG_LLM_ENDPOINT=127.0.0.1:8090 VG_LLM_TIMEOUT_MS=2500 pe-engined
+  # (2500 ms timeout: the 2B model takes ~1-4 s per uncached prompt on CPU.)
+  # Run ./provision-policy-rules.sh first to download the model into
+  # policy-engine/models/. Start with: docker compose --profile llm up llm
+  llm:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    profiles: ["llm"]
+    command: >
+      -m /models/granite-guardian-3.0-2b.Q4_K_M.gguf
+      --host 0.0.0.0 --port 8090
+      --ctx-size 2048 --parallel 2 --no-webui
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./policy-engine/models:/models:ro
+    networks:
+      - vguardrail-local
+
+networks:
+  vguardrail-local:
+    driver: bridge

@@ -1,0 +1,20 @@
+[package]
+name = "pe-grpc"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "VGuardrail Policy Engine — gRPC contract (generated tonic types), domain mapping, and UDS transport."
+
+[dependencies]
+pe-core = { workspace = true }
+tonic = { workspace = true }
+prost = { workspace = true }
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+
+[build-dependencies]
+tonic-build = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

@@ -1,0 +1,48 @@
+<idea-plugin>
+    <id>com.vguardrail.jetbrains</id>
+    <name>VGuardrail</name>
+    <vendor>VGuardrail</vendor>
+    <description><![CDATA[
+        Scans prompts against the local VGuardrail policy engine before they are
+        sent to an AI provider. Decisions are fail-closed: if the engine (or the
+        Node bridge that reaches it) is unavailable, the prompt is blocked.
+        <br/><br/>
+        Requires Node.js ≥ 20 and the built bridge at
+        <code>ide-connectors/jetbrains/bridge/dist/index.js</code> (configurable
+        under Settings → Tools → VGuardrail), plus the VGuardrail macOS agent stack.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="VGuardrail" displayType="BALLOON"/>
+        <postStartupActivity implementation="com.vguardrail.jetbrains.startup.BridgeAvailabilityActivity"/>
+        <toolWindow id="VGuardrail"
+                    anchor="bottom"
+                    icon="AllIcons.Toolwindows.ToolWindowMessages"
+                    factoryClass="com.vguardrail.jetbrains.toolwindow.VGuardrailToolWindowFactory"/>
+        <applicationConfigurable
+                parentId="tools"
+                id="com.vguardrail.jetbrains.settings"
+                displayName="VGuardrail"
+                instance="com.vguardrail.jetbrains.settings.VGuardrailConfigurable"/>
+    </extensions>
+
+    <actions>
+        <action id="VGuardrail.ScanPrompt"
+                class="com.vguardrail.jetbrains.actions.ScanPromptAction"
+                text="Scan Prompt with VGuardrail"
+                description="Scan the editor selection (or an entered prompt) against the local VGuardrail policy engine">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="meta shift G"/>
+        </action>
+        <action id="VGuardrail.ScanFile"
+                class="com.vguardrail.jetbrains.actions.ScanFileAction"
+                text="Scan Current File with VGuardrail"
+                description="Scan the active editor's full text against the local VGuardrail policy engine (files over 256 KiB are skipped)">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>

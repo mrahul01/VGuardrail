@@ -1,0 +1,48 @@
+{
+  "name": "@vguardrail/cli-framework",
+  "version": "1.0.0",
+  "description": "Core framework for VGuardrail CLI connectors",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "postinstall": "node scripts/fix-pty-helper.mjs",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "dependencies": {
+    "@vguardrail/connector-sdk": "file:../../connector-sdk",
+    "execa": "^9.6.1",
+    "inquirer": "^9.2.22",
+    "node-pty": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.9",
+    "@types/node": "^20.14.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}

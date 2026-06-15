@@ -1,0 +1,114 @@
+# VGuardrail — local development Docker Compose.
+#
+# Single-command local stack for day-to-day development:
+#
+#     docker compose -f docker-compose.dev.yml up
+#
+# What's different from `docker-compose.yml`:
+#
+#   * `backend` source is bind-mounted; `cargo-watch` re-compiles on
+#     save and restarts the process. The container keeps its
+#     distroless base + Cargo cache.
+#   * `dashboard` source is bind-mounted; `next dev` runs in
+#     hot-reload mode on port 3000.
+#   * `VG_DEV_CLAIMS=1` is on by default so you can hit the API
+#     with `x-vg-*` headers without minting a Cognito token.
+#     **Never** enable this in any non-local environment.
+#   * No LocalStack, no AWS Lambda emulation. The backend talks
+#     straight to the real AWS account using your host
+#     `~/.aws/credentials` (or the env vars from `.env`).
+#
+# Health & smoke tests
+#
+#     curl -s http://localhost:8080/health                  # backend
+#     curl -s -H 'x-vg-org-id: org-default' \
+#          -H 'x-vg-role: org_admin' \
+#          http://localhost:8080/admin/stats | jq           # admin route
+#     open http://localhost:3000                            # dashboard
+
+name: vguardrail-dev
+
+services:
+  backend:
+    image: rust:1.82-bookworm
+    container_name: vguardrail-backend-dev
+    working_dir: /app
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        apt-get update && apt-get install -y --no-install-recommends \
+          ca-certificates pkg-config libssl-dev protobuf-compiler \
+          && rm -rf /var/lib/apt/lists/*
+        cargo install --locked cargo-watch
+        # Bind-mount over the source for hot-reload.
+        cargo watch -w /app/backend/lambdas -w /app/backend/server -w /app/policy-engine \
+          -s 'cargo run --release --manifest-path backend/lambdas/Cargo.toml --bin server'
+    volumes:
+      # Source
+      - .:/app
+      # Cargo registry / target cache (persist between runs)
+      - cargo-target:/app/backend/lambdas/target
+      - cargo-registry:/usr/local/cargo/registry
+      # AWS credentials from the host
+      - ${HOME}/.aws:/root/.aws:ro
+    ports:
+      - "8080:8080"
+    environment:
+      BIND_ADDR: "0.0.0.0:8080"
+      RUST_LOG: "info,server=debug,tower_http=info"
+      CARGO_HOME: "/usr/local/cargo"
+      # AWS creds / region
+      AWS_REGION: "${AWS_REGION:-us-east-1}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
+      AWS_SESSION_TOKEN: "${AWS_SESSION_TOKEN:-}"
+      # Resource names (override in .env)
+      VG_CORE_TABLE: "${VG_CORE_TABLE:-vguardrail-core-dev}"
+      VG_AUDIT_TABLE: "${VG_AUDIT_TABLE:-vguardrail-audit-dev}"
+      VG_AUDIT_BUCKET: "${VG_AUDIT_BUCKET:-vguardrail-audit-archive-dev}"
+      VG_USER_POOL_ID: "${VG_USER_POOL_ID:-us-east-1_dev}"
+      VG_APP_CLIENT_ID: "${VG_APP_CLIENT_ID:-dev-client-id}"
+      VG_ENROLLMENT_PREFIX: "${VG_ENROLLMENT_PREFIX:-vguardrail/enrollment/}"
+      VG_POLICY_PUBKEY: "${VG_POLICY_PUBKEY:-}"
+      VG_COGNITO_ISSUER: "${VG_COGNITO_ISSUER:-https://cognito-idp.localhost.localstack.cloud/us-east-1_dev}"
+      # LOCAL DEV ONLY
+      VG_DEV_CLAIMS: "1"
+    env_file:
+      - .env
+    networks:
+      - vguardrail-dev
+
+  dashboard:
+    image: node:20-alpine
+    container_name: vguardrail-dashboard-dev
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev"
+    volumes:
+      - ./dashboard:/app
+      - dashboard-node-modules:/app/node_modules
+      - dashboard-next:/app/.next
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+      BACKEND_API_URL: "http://backend:8080"
+      NEXT_TELEMETRY_DISABLED: "1"
+      # Pass through so the BFF can read the mock seed session.
+      VG_DATA_MODE: "${VG_DATA_MODE:-mock}"
+    networks:
+      - vguardrail-dev
+    depends_on:
+      - backend
+
+networks:
+  vguardrail-dev:
+    driver: bridge
+
+volumes:
+  cargo-target:
+  cargo-registry:
+  dashboard-node-modules:
+  dashboard-next:

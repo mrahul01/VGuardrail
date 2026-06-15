@@ -1,0 +1,104 @@
+// SYNCED COPY — do not edit by hand.
+// Source of truth: policy-engine/crates/pe-grpc/proto/policy_engine/v1/policy_engine.proto
+// Re-sync with Scripts/gen-proto.sh. The GRPCProtobufGenerator build plugin
+// generates the Swift client from this file at build time (VG_GRPC=1).
+syntax = "proto3";
+package vguardrail.policy_engine.v1;
+
+service PolicyEngine {
+  rpc Evaluate (EvaluateRequest) returns (EvaluateResponse);
+  rpc LoadPolicy (LoadPolicyRequest) returns (LoadPolicyResponse);
+  rpc Health (HealthRequest) returns (HealthResponse);
+}
+
+message EvaluateRequest {
+  string request_id = 1;
+  string text = 2;
+  ScanContext context = 3;
+}
+
+message ScanContext {
+  Source source = 1;
+  string provider = 2;
+  string model = 3;
+  string app = 4;
+  RepoContext repo = 5;
+  FileContext file = 6;
+  UserContext user = 7;
+}
+
+enum Source { SOURCE_UNSPECIFIED = 0; BROWSER = 1; IDE = 2; CLI = 3; API = 4; }
+
+message RepoContext { string name = 1; Classification classification = 2; }
+message FileContext { string path = 1; string extension = 2; }
+message UserContext { string user_id = 1; Role role = 2; repeated string groups = 3; }
+
+enum Role {
+  ROLE_UNSPECIFIED = 0; SUPER_ADMIN = 1; SECURITY_ADMIN = 2;
+  AUDITOR = 3; MANAGER = 4; USER = 5;
+}
+
+message EvaluateResponse {
+  string request_id = 1;
+  Action action = 2;
+  RiskLevel risk_level = 3;
+  Classification classification = 4;
+  string matched_rule_id = 5;
+  Severity severity = 6;
+  repeated Finding findings = 7;
+  repeated Suppression suppressions = 8;
+  string reason = 9;
+  uint32 policy_version = 10;
+  uint32 elapsed_micros = 11;
+  bool incomplete = 12;
+  Category category = 13;           // primary policy category (UNSPECIFIED => none)
+}
+
+enum Action { ACTION_UNSPECIFIED = 0; ALLOW = 1; WARN = 2; BLOCK = 3; }
+enum RiskLevel { RISK_UNSPECIFIED = 0; LOW = 1; MEDIUM = 2; HIGH = 3; CRITICAL = 4; }
+enum Severity {
+  SEVERITY_UNSPECIFIED = 0; SEV_LOW = 1; SEV_MEDIUM = 2; SEV_HIGH = 3; SEV_CRITICAL = 4;
+}
+enum Classification {
+  CLASSIFICATION_UNSPECIFIED = 0; PUBLIC = 1; INTERNAL = 2; CONFIDENTIAL = 3; RESTRICTED = 4;
+}
+
+message Finding {
+  string detector_id = 1;
+  Category category = 2;
+  string kind = 3;
+  uint32 span_start = 4;
+  uint32 span_end = 5;
+  float confidence = 6;
+  Severity severity = 7;
+  string redacted_preview = 8;
+  map<string, string> meta = 9;
+}
+
+enum Category {
+  CATEGORY_UNSPECIFIED = 0; SECRET = 1; PII = 2; SOURCE_CODE = 3; CLASSIFICATION = 4;
+  COMPANY_CONFIDENTIAL = 5; FINANCIAL = 6; INTELLECTUAL_PROPERTY = 7; USAGE_POLICY = 8;
+  PROMPT_INJECTION = 9; SENSITIVE_DOCUMENT = 10; CUSTOMER_DATA = 11; COMPLIANCE = 12;
+  KEYWORD = 13; FILE_POLICY = 14; IMAGE_POLICY = 15; AI_CLASSIFICATION = 16;
+  DESTRUCTIVE_COMMAND = 17;
+  LEGAL = 18; MEDICAL = 19; HR = 20; SECURITY = 21; RESEARCH_DEVELOPMENT = 22;
+  COMMUNICATION = 23; PROCUREMENT = 24; GOVERNMENT = 25;
+}
+
+message Suppression { string rule_id = 1; string exception_id = 2; }
+
+message LoadPolicyRequest { bytes bundle_json = 1; }
+message LoadPolicyResponse {
+  bool accepted = 1;
+  uint32 active_version = 2;
+  string reject_reason = 3;
+}
+
+message HealthRequest {}
+message HealthResponse {
+  ServingStatus status = 1;
+  uint32 active_policy_version = 2;
+  uint64 queued_events = 3;
+  string engine_version = 4;
+}
+enum ServingStatus { SERVING_UNSPECIFIED = 0; SERVING = 1; NOT_SERVING = 2; }

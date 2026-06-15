@@ -1,0 +1,12 @@
+{
+  "request_id": "req-allow-1",
+  "action": "allow",
+  "risk_level": "low",
+  "classification": "public",
+  "findings": [],
+  "suppressions": [],
+  "reason": "no rule matched",
+  "policy_version": 7,
+  "elapsed_micros": 1200,
+  "incomplete": false
+}

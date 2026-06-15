@@ -1,0 +1,16 @@
+{
+  "name": "@vguardrail/brave-extension",
+  "version": "0.1.0",
+  "description": "VGuardrail Brave connector (MV3): gates AI prompts on chatgpt.com, claude.ai, gemini.google.com, perplexity.ai via the native messaging host. Thin build of the Chrome extension source.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "build": "node esbuild.config.mjs"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.270",
+    "esbuild": "^0.23.0",
+    "typescript": "^5.5.4"
+  }
+}

@@ -1,0 +1,5 @@
+this is a perfectly ordinary sentence with no secrets
+AKIA is too short to be a key
+the meeting is scheduled for 3pm tomorrow
+SHORTKEY1234 not a valid pattern
+aws documentation mentions access keys generically

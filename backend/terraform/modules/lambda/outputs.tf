@@ -1,0 +1,16 @@
+output "function_name" {
+  value = aws_lambda_function.this.function_name
+}
+
+output "function_arn" {
+  value = aws_lambda_function.this.arn
+}
+
+output "invoke_arn" {
+  value       = aws_lambda_function.this.invoke_arn
+  description = "ARN used by the API Gateway integration."
+}
+
+output "role_name" {
+  value = aws_iam_role.this.name
+}

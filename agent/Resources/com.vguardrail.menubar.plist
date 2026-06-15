@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- LaunchAgent for the VGuardrail menu bar app. Install to
+     /Library/LaunchAgents/ (loads per-user at login). The app itself must carry
+     LSUIElement=true in its Info.plist so it has no Dock icon. -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.vguardrail.menubar</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Applications/VGuardrail.app/Contents/MacOS/VGuardrailMenuBar</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>LimitLoadToSessionType</key>
+    <string>Aqua</string>
+</dict>
+</plist>

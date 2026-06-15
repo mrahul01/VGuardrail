@@ -1,0 +1,63 @@
+[package]
+name = "functions"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "VGuardrail Audit Cloud — Lambda function binaries."
+
+[lib]
+name = "functions"
+path = "src/lib.rs"
+
+[[bin]]
+name = "health"
+path = "src/bin/health.rs"
+
+[[bin]]
+name = "register"
+path = "src/bin/register.rs"
+
+[[bin]]
+name = "policy-latest"
+path = "src/bin/policy_latest.rs"
+
+[[bin]]
+name = "events-batch"
+path = "src/bin/events_batch.rs"
+
+[[bin]]
+name = "admin-stats"
+path = "src/bin/admin_stats.rs"
+
+[[bin]]
+name = "admin-devices"
+path = "src/bin/admin_devices.rs"
+
+[[bin]]
+name = "admin-audit"
+path = "src/bin/admin_audit.rs"
+
+[[bin]]
+name = "admin-policies-exceptions"
+path = "src/bin/admin_policies_exceptions.rs"
+
+[[bin]]
+name = "admin-users"
+path = "src/bin/admin_users.rs"
+
+[[bin]]
+name = "admin-settings"
+path = "src/bin/admin_settings.rs"
+
+[dependencies]
+app = { workspace = true }
+audit-core = { workspace = true }
+aws-adapters = { workspace = true }
+lambda_http = { workspace = true }
+lambda_runtime = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

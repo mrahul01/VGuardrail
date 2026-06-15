@@ -1,0 +1,26 @@
+{
+  "request_id": "req-block-1",
+  "action": "block",
+  "risk_level": "critical",
+  "classification": "restricted",
+  "matched_rule_id": "rule.secret.aws",
+  "severity": "critical",
+  "findings": [
+    {
+      "detector_id": "secret.aws_access_key",
+      "category": "secret",
+      "kind": "aws_access_key",
+      "span_start": 10,
+      "span_end": 30,
+      "confidence": 0.99,
+      "severity": "critical",
+      "redacted_preview": "AKIA****************",
+      "meta": { "line": "3" }
+    }
+  ],
+  "suppressions": [],
+  "reason": "blocked by rule.secret.aws",
+  "policy_version": 7,
+  "elapsed_micros": 4300,
+  "incomplete": false
+}
